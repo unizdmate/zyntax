@@ -19,6 +19,7 @@ import { ConversionOptions } from "@/components/converter/ConversionOptions";
 import {
   ConversionOptions as ConversionOptionsType,
   OutputLanguage,
+  ExportStrategy,
 } from "@/types";
 
 export default function Home() {
@@ -32,7 +33,7 @@ export default function Home() {
     useType: false,
     useInterfaces: true,
     useSemicolons: true,
-    useExport: true,
+    exportStrategy: ExportStrategy.ALL,
     indentationSpaces: 2,
   });
 

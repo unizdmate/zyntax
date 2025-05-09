@@ -22,12 +22,18 @@ export enum OutputLanguage {
   JAVA = "Java",
 }
 
+export enum ExportStrategy {
+  NONE = "none",
+  TOP_LEVEL = "topLevel",
+  ALL = "all"
+}
+
 export interface ConversionOptions {
   interfaceName?: string;
   useType?: boolean;
   useInterfaces?: boolean;
   useSemicolons?: boolean;
-  useExport?: boolean;
+  exportStrategy?: ExportStrategy;
   indentationSpaces?: number;
 }
 

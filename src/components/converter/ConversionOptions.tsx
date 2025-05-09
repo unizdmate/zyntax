@@ -11,7 +11,10 @@ import {
   TextInput,
   Title,
 } from "@mantine/core";
-import { ConversionOptions as ConversionOptionsType } from "@/types";
+import {
+  ConversionOptions as ConversionOptionsType,
+  ExportStrategy,
+} from "@/types";
 import { useState } from "react";
 
 interface ConversionOptionsProps {
@@ -78,6 +81,34 @@ export function ConversionOptions({
           </Group>
         </Radio.Group>
 
+        <Text size="sm" fw={500} mt="xs">
+          Export Strategy
+        </Text>
+
+        <Radio.Group
+          value={localOptions.exportStrategy || ExportStrategy.ALL}
+          onChange={(value) => handleChange("exportStrategy", value)}
+          name="exportStrategy"
+        >
+          <Stack>
+            <Radio
+              value={ExportStrategy.ALL}
+              label="Export all types/interfaces"
+              description="Every definition will have an export keyword"
+            />
+            <Radio
+              value={ExportStrategy.TOP_LEVEL}
+              label="Export top-level only"
+              description="Only the root type/interface will have an export keyword"
+            />
+            <Radio
+              value={ExportStrategy.NONE}
+              label="No exports"
+              description="No export keywords will be added"
+            />
+          </Stack>
+        </Radio.Group>
+
         <Group>
           <Checkbox
             label="Use semicolons"
@@ -85,12 +116,6 @@ export function ConversionOptions({
             onChange={(e) =>
               handleChange("useSemicolons", e.currentTarget.checked)
             }
-          />
-
-          <Checkbox
-            label="Use export"
-            checked={localOptions.useExport ?? true}
-            onChange={(e) => handleChange("useExport", e.currentTarget.checked)}
           />
         </Group>
       </Stack>

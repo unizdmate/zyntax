@@ -18,7 +18,7 @@ const ConversionRequestSchema = z.object({
     useType: z.boolean().optional(),
     useInterfaces: z.boolean().optional(),
     useSemicolons: z.boolean().optional(),
-    useExport: z.boolean().optional(),
+    exportStrategy: z.string().optional(),  // Changed from useExport to exportStrategy
     indentationSpaces: z.number().optional(),
   }).optional(),
 });

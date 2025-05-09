@@ -1,13 +1,14 @@
 /**
  * JSON to TypeScript converter utility
  */
+import { ExportStrategy } from "@/types";
 
 type ConversionOptions = {
   interfaceName?: string;
   useType?: boolean;
   useInterfaces?: boolean;
   useSemicolons?: boolean;
-  useExport?: boolean;
+  exportStrategy?: ExportStrategy;
   indentationSpaces?: number;
 };
 
@@ -28,23 +29,40 @@ export function convertJsonToTypeScript(
       useType = false,
       useInterfaces = true,
       useSemicolons = true,
-      useExport = true,
+      exportStrategy = ExportStrategy.ALL,
       indentationSpaces = 2,
     } = options;
+
+    // Collection of generated types/interfaces and a set to track used names
+    const generatedTypes = new Map<string, string>();
+    const usedTypeNames = new Set<string>();
     
     // Generate TypeScript code
-    const result = generateTypeScriptFromObject(
+    generateTypeScriptFromObject(
       parsedJson, 
       interfaceName, 
       { 
-        interfaceName,  // Include interfaceName in the options
+        interfaceName,
         useType, 
         useInterfaces, 
         useSemicolons, 
-        useExport, 
+        exportStrategy, 
         indentationSpaces 
-      }
+      },
+      generatedTypes,
+      usedTypeNames,
+      true // isRoot flag
     );
+    
+    // Apply export strategy after all types have been generated
+    const finalGeneratedTypes = applyExportStrategy(
+      generatedTypes, 
+      exportStrategy, 
+      interfaceName
+    );
+    
+    // Combine all generated types in the correct order
+    const result = Array.from(finalGeneratedTypes.values()).join('\n\n');
     
     return { code: result, error: null };
   } catch (error) {
@@ -56,54 +74,243 @@ export function convertJsonToTypeScript(
 }
 
 /**
+ * Generate a nested type definition for TOP_LEVEL export strategy
+ * This creates a single exported root type with all nested types inside
+ */
+function generateNestedTypeDefinition(
+  obj: any,
+  rootName: string,
+  useType: boolean,
+  useInterfaces: boolean,
+  useSemicolons: boolean,
+  indentationSpaces: number
+): { code: string; error?: null } | { code: null; error: string } {
+  try {
+    const semicolon = useSemicolons ? ';' : '';
+    const declarationType = useType || !useInterfaces ? 'type' : 'interface';
+    const indent = ' '.repeat(indentationSpaces);
+    
+    // Start building the root type
+    const lines: string[] = [];
+    lines.push(`export ${declarationType} ${rootName} {`);
+    
+    // Process each top-level property and generate nested interfaces
+    for (const [key, value] of Object.entries(obj)) {
+      // Generate the property code
+      const propType = generateNestedType(
+        key,
+        value,
+        indentationSpaces,
+        1,
+        useType,
+        useInterfaces,
+        useSemicolons
+      );
+      lines.push(propType);
+    }
+    
+    lines.push(`}${semicolon}`);
+    return { code: lines.join('\n'), error: null };
+  } catch (error) {
+    return { 
+      code: null, 
+      error: `Error generating nested TypeScript definition: ${(error as Error).message}` 
+    };
+  }
+}
+
+/**
+ * Generate a type definition for a property with all nested types inline
+ */
+function generateNestedType(
+  key: string,
+  value: any,
+  indentationSpaces: number,
+  depth: number,
+  useType: boolean,
+  useInterfaces: boolean,
+  useSemicolons: boolean
+): string {
+  const indent = ' '.repeat(indentationSpaces * depth);
+  const semicolon = useSemicolons ? ';' : '';
+  const validKey = /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(key) 
+    ? key 
+    : `"${key}"`;
+  
+  // Handle different value types
+  if (value === null) {
+    return `${indent}${validKey}: null${semicolon}`;
+  } 
+  
+  if (typeof value !== 'object') {
+    return `${indent}${validKey}: ${typeof value}${semicolon}`;
+  }
+  
+  // Handle arrays
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return `${indent}${validKey}: any[]${semicolon}`;
+    }
+    
+    const firstItem = value[0];
+    if (typeof firstItem !== 'object' || firstItem === null) {
+      return `${indent}${validKey}: ${typeof firstItem}[]${semicolon}`;
+    }
+    
+    // Handle array of objects by defining the type inline
+    const lines = [`${indent}${validKey}: Array<{`];
+    
+    // Process each property of the first object in the array
+    for (const [propKey, propValue] of Object.entries(firstItem)) {
+      const nestedTypeStr = generateNestedType(
+        propKey,
+        propValue,
+        indentationSpaces,
+        depth + 1,
+        useType,
+        useInterfaces,
+        useSemicolons
+      );
+      lines.push(nestedTypeStr);
+    }
+    
+    lines.push(`${indent}}>${semicolon}`);
+    return lines.join('\n');
+  }
+  
+  // Handle regular objects by defining interface inline
+  const lines = [`${indent}${validKey}: {`];
+  
+  // Process each property of the object
+  for (const [propKey, propValue] of Object.entries(value)) {
+    const nestedTypeStr = generateNestedType(
+      propKey,
+      propValue,
+      indentationSpaces,
+      depth + 1,
+      useType,
+      useInterfaces,
+      useSemicolons
+    );
+    lines.push(nestedTypeStr);
+  }
+  
+  lines.push(`${indent}}${semicolon}`);
+  return lines.join('\n');
+}
+
+/**
+ * Apply the selected export strategy to the generated types
+ */
+function applyExportStrategy(
+  generatedTypes: Map<string, string>,
+  exportStrategy: ExportStrategy,
+  rootName: string
+): Map<string, string> {
+  // If all types should be exported, return as is
+  if (exportStrategy === ExportStrategy.ALL) {
+    return new Map(generatedTypes);
+  }
+
+  const result = new Map<string, string>();
+  
+  for (const [name, typeDef] of generatedTypes.entries()) {
+    // For TOP_LEVEL strategy, keep export only for the root type
+    // For NONE strategy, remove all exports
+    const shouldKeepExport = 
+      exportStrategy === ExportStrategy.TOP_LEVEL && name === rootName;
+    
+    if (shouldKeepExport) {
+      // Keep as is
+      result.set(name, typeDef);
+    } else {
+      // Remove the export keyword
+      const withoutExport = typeDef.replace(/^export\s+/, '');
+      result.set(name, withoutExport);
+    }
+  }
+  
+  return result;
+}
+
+/**
  * Generate TypeScript type definitions from a JavaScript object
  */
 function generateTypeScriptFromObject(
   obj: unknown, 
   name: string, 
   options: Required<ConversionOptions>,
-  indent = 0
+  generatedTypes: Map<string, string>,
+  usedTypeNames: Set<string>,
+  isRoot = false,
+  parentName = ""
 ): string {
-  const { useType, useInterfaces, useSemicolons, useExport, indentationSpaces } = options;
+  const { useType, useInterfaces, useSemicolons, exportStrategy, indentationSpaces } = options;
   
   // Create indentation strings
-  const indentStr = ' '.repeat(indentationSpaces * indent);
-  const indentStrInner = ' '.repeat(indentationSpaces * (indent + 1));
+  const indentStr = ' '.repeat(indentationSpaces * 0); // Top-level indentation
+  const indentStrInner = ' '.repeat(indentationSpaces * 1);
   
   // Choose type or interface
   const declarationType = useType || !useInterfaces ? 'type' : 'interface';
   
-  // Generate the export keyword if needed
-  const exportKeyword = useExport ? 'export ' : '';
+  // Always generate with export keyword initially
+  // We'll apply the export strategy later
+  const exportKeyword = 'export ';
   
   // Add semicolons if needed
   const semicolon = useSemicolons ? ';' : '';
   
   if (obj === null) {
-    return `${exportKeyword}${declarationType} ${name} = null${semicolon}`;
+    const typeDef = `${exportKeyword}${declarationType} ${name} = null${semicolon}`;
+    generatedTypes.set(name, typeDef);
+    usedTypeNames.add(name);
+    return name;
   }
   
   if (typeof obj !== 'object') {
-    return `${exportKeyword}${declarationType} ${name} = ${typeof obj}${semicolon}`;
+    const typeDef = `${exportKeyword}${declarationType} ${name} = ${typeof obj}${semicolon}`;
+    generatedTypes.set(name, typeDef);
+    usedTypeNames.add(name);
+    return name;
   }
   
   // Handle arrays
   if (Array.isArray(obj)) {
     if (obj.length === 0) {
-      return `${exportKeyword}${declarationType} ${name} = any[]${semicolon}`;
+      const typeDef = `${exportKeyword}${declarationType} ${name} = any[]${semicolon}`;
+      generatedTypes.set(name, typeDef);
+      usedTypeNames.add(name);
+      return name;
     }
     
     // Find the common type of array elements
     const sample = obj[0];
-    const arrayType = typeof sample === 'object' && sample !== null
-      ? `${name}Item`
-      : typeof sample;
+    
+    if (typeof sample === 'object' && sample !== null) {
+      // For objects in arrays, create a separate type for the items
+      // Use a simplified naming approach - just Item suffix
+      const itemTypeName = `${name}Item`;
+      generateTypeScriptFromObject(
+        sample, 
+        itemTypeName, 
+        options, 
+        generatedTypes, 
+        usedTypeNames,
+        false,
+        name
+      );
       
-    const result = typeof sample === 'object' && sample !== null
-      ? `${generateTypeScriptFromObject(sample, `${name}Item`, options, indent)}\n\n${indentStr}${exportKeyword}${declarationType} ${name} = ${name}Item[]${semicolon}`
-      : `${exportKeyword}${declarationType} ${name} = ${arrayType}[]${semicolon}`;
-      
-    return result;
+      const typeDef = `${exportKeyword}${declarationType} ${name} = ${itemTypeName}[]${semicolon}`;
+      generatedTypes.set(name, typeDef);
+      usedTypeNames.add(name);
+    } else {
+      const typeDef = `${exportKeyword}${declarationType} ${name} = ${typeof sample}[]${semicolon}`;
+      generatedTypes.set(name, typeDef);
+      usedTypeNames.add(name);
+    }
+    
+    return name;
   }
   
   // Handle objects
@@ -132,37 +339,93 @@ function generateTypeScriptFromObject(
       if (value.length === 0) {
         lines.push(`${indentStrInner}${validKey}: any[]${semicolon}`);
       } else {
-        const elementType = typeof value[0] === 'object' && value[0] !== null
-          ? `${name}${capitalizeFirstLetter(key)}`
-          : typeof value[0];
+        // Create appropriate nested type name based on context
+        let nestedTypeName = createNestedTypeName(key, name, parentName, usedTypeNames, isRoot);
         
         if (typeof value[0] === 'object' && value[0] !== null) {
-          const nestedType = generateTypeScriptFromObject(
+          // Generate the nested type first (will be added to generatedTypes)
+          generateTypeScriptFromObject(
             value[0], 
-            `${name}${capitalizeFirstLetter(key)}`, 
+            nestedTypeName, 
             options, 
-            indent + 1
+            generatedTypes, 
+            usedTypeNames,
+            false,
+            name
           );
-          lines.push(nestedType);
-          lines.push(`${indentStrInner}${validKey}: ${name}${capitalizeFirstLetter(key)}[]${semicolon}`);
+          lines.push(`${indentStrInner}${validKey}: ${nestedTypeName}[]${semicolon}`);
         } else {
-          lines.push(`${indentStrInner}${validKey}: ${elementType}[]${semicolon}`);
+          lines.push(`${indentStrInner}${validKey}: ${typeof value[0]}[]${semicolon}`);
         }
       }
     } else {
-      const nestedType = generateTypeScriptFromObject(
+      // Create appropriate nested type name based on context
+      let nestedTypeName = createNestedTypeName(key, name, parentName, usedTypeNames, isRoot);
+      
+      // Generate the nested type first (will be added to generatedTypes)
+      generateTypeScriptFromObject(
         value, 
-        `${name}${capitalizeFirstLetter(key)}`, 
+        nestedTypeName, 
         options, 
-        indent + 1
+        generatedTypes, 
+        usedTypeNames,
+        false,
+        name
       );
-      lines.push(nestedType);
-      lines.push(`${indentStrInner}${validKey}: ${name}${capitalizeFirstLetter(key)}${semicolon}`);
+      lines.push(`${indentStrInner}${validKey}: ${nestedTypeName}${semicolon}`);
     }
   }
   
   lines.push(`${indentStr}}${semicolon}`);
-  return lines.join('\n');
+  generatedTypes.set(name, lines.join('\n'));
+  usedTypeNames.add(name);
+  return name;
+}
+
+/**
+ * Create a nested type name based on context, avoiding name collisions
+ * and using more intuitive names for nested structures
+ */
+function createNestedTypeName(
+  key: string, 
+  parentName: string, 
+  grandparentName: string,
+  usedNames: Set<string>,
+  isRoot: boolean
+): string {
+  // Capitalize the property name
+  const capitalizedKey = capitalizeFirstLetter(key);
+  
+  let proposedName: string;
+  
+  if (isRoot) {
+    // For root level, use the parent name as prefix
+    proposedName = `${parentName}${capitalizedKey}`;
+  } else {
+    // For deeply nested properties, just use the property name if possible
+    // to avoid overly long type names
+    if (!usedNames.has(capitalizedKey)) {
+      proposedName = capitalizedKey;
+    } else {
+      // If there's a name collision, use the parent name as context
+      proposedName = `${parentName}${capitalizedKey}`;
+    }
+  }
+  
+  // If the name is still in use, make it unique by appending a number
+  if (usedNames.has(proposedName) && proposedName !== parentName) {
+    let counter = 1;
+    let uniqueName = `${proposedName}${counter}`;
+    
+    while (usedNames.has(uniqueName)) {
+      counter++;
+      uniqueName = `${proposedName}${counter}`;
+    }
+    
+    return uniqueName;
+  }
+  
+  return proposedName;
 }
 
 /**
