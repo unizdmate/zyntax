@@ -1,15 +1,18 @@
 "use client";
 
 import { MantineProvider, createTheme } from "@mantine/core";
-import { SessionProvider } from "next-auth/react";
+import { SessionProvider, useSession } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect, createContext, useContext } from "react";
+import { useLocalStorage } from "usehooks-ts";
 import axios from "axios";
 
 // Create a context for color scheme management
+type ColorScheme = "light" | "dark" | "auto";
+
 type ColorSchemeContextType = {
-  colorScheme: "light" | "dark" | "auto";
-  setColorScheme: (colorScheme: "light" | "dark" | "auto") => Promise<void>;
+  colorScheme: ColorScheme;
+  setColorScheme: (colorScheme: ColorScheme) => Promise<void>;
 };
 
 export const ColorSchemeContext = createContext<ColorSchemeContextType>({
@@ -20,6 +23,7 @@ export const ColorSchemeContext = createContext<ColorSchemeContextType>({
 // Custom hook to use color scheme
 export const useColorScheme = () => useContext(ColorSchemeContext);
 
+// Create theme
 const theme = createTheme({
   primaryColor: "blue",
   fontFamily: "Inter, sans-serif",
@@ -39,48 +43,120 @@ const theme = createTheme({
   },
 });
 
-export function Providers({ children }: { children: React.ReactNode }) {
-  const [queryClient] = useState(() => new QueryClient());
-  const [colorScheme, setColorSchemeState] = useState<
-    "light" | "dark" | "auto"
-  >("light");
+// The inner provider that handles theme logic
+function ThemeProvider({ children }: { children: React.ReactNode }) {
+  const { status } = useSession();
+  const isAuthenticated = status === "authenticated";
+
+  // Use localStorage as the primary storage mechanism
+  const [storedColorScheme, setStoredColorScheme] =
+    useLocalStorage<ColorScheme>("zyntax-color-scheme", "light");
+
+  // State to track if we're currently syncing with server
+  const [isSyncing, setIsSyncing] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Function to save color scheme preference
-  const setColorScheme = async (newColorScheme: "light" | "dark" | "auto") => {
-    setColorSchemeState(newColorScheme);
+  // Keep a local state for immediate UI updates
+  const [currentColorScheme, setCurrentColorScheme] = useState<
+    "light" | "dark"
+  >(
+    storedColorScheme === "auto"
+      ? window?.matchMedia?.("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light"
+      : storedColorScheme === "dark"
+        ? "dark"
+        : "light"
+  );
 
-    // If user is authenticated, save preference to database
-    try {
-      await axios.post("/api/user/theme", { colorScheme: newColorScheme });
-    } catch (error) {
-      // For unauthenticated users, just save in localStorage
-      localStorage.setItem("colorScheme", newColorScheme);
-    }
-  };
-
-  // Initialize color scheme on mount
+  // Listen for system preference changes if using "auto"
   useEffect(() => {
-    const fetchColorScheme = async () => {
-      try {
-        // Try to get color scheme from the server (for authenticated users)
-        const response = await axios.get("/api/user/theme");
-        if (response.data?.success && response.data?.data?.colorScheme) {
-          setColorSchemeState(response.data.data.colorScheme);
+    if (storedColorScheme === "auto" && typeof window !== "undefined") {
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)");
+
+      const handleChange = (e: MediaQueryListEvent) => {
+        setCurrentColorScheme(e.matches ? "dark" : "light");
+      };
+
+      mediaQuery.addEventListener("change", handleChange);
+      return () => mediaQuery.removeEventListener("change", handleChange);
+    }
+  }, [storedColorScheme]);
+
+  // Update current theme whenever stored preference changes
+  useEffect(() => {
+    if (storedColorScheme === "auto" && typeof window !== "undefined") {
+      const isDarkMode = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      setCurrentColorScheme(isDarkMode ? "dark" : "light");
+    } else {
+      setCurrentColorScheme(storedColorScheme === "dark" ? "dark" : "light");
+    }
+  }, [storedColorScheme]);
+
+  // Sync with server on authentication status change
+  useEffect(() => {
+    const syncWithServer = async () => {
+      if (isAuthenticated && !isSyncing) {
+        setIsSyncing(true);
+        try {
+          // First try to get user preference from server
+          const response = await axios.get("/api/user/theme");
+          if (response.data?.success && response.data?.data?.colorScheme) {
+            const serverScheme = response.data.data.colorScheme as ColorScheme;
+            // Update local storage if server has different value
+            if (serverScheme !== storedColorScheme) {
+              setStoredColorScheme(serverScheme);
+            }
+          } else {
+            // If no server preference, sync local preference to server
+            await axios.post("/api/user/theme", {
+              colorScheme: storedColorScheme,
+            });
+          }
+        } catch (error) {
+          console.error("Error syncing theme with server:", error);
+        } finally {
+          setIsSyncing(false);
+          setIsInitialized(true);
         }
-      } catch (error) {
-        // If API call fails (unauthenticated), check localStorage
-        const storedScheme = localStorage.getItem("colorScheme");
-        if (storedScheme && ["light", "dark", "auto"].includes(storedScheme)) {
-          setColorSchemeState(storedScheme as "light" | "dark" | "auto");
-        }
-      } finally {
+      } else {
+        // For unauthenticated users, just ensure localStorage value is applied
         setIsInitialized(true);
       }
     };
 
-    fetchColorScheme();
-  }, []);
+    syncWithServer();
+  }, [isAuthenticated, storedColorScheme]);
+
+  // Function to save color scheme preference
+  const setColorScheme = async (newColorScheme: ColorScheme) => {
+    // Always update localStorage first (main source of truth)
+    setStoredColorScheme(newColorScheme);
+
+    // Update current color scheme for immediate UI response
+    if (newColorScheme === "auto" && typeof window !== "undefined") {
+      const isDarkMode = window.matchMedia(
+        "(prefers-color-scheme: dark)"
+      ).matches;
+      setCurrentColorScheme(isDarkMode ? "dark" : "light");
+    } else {
+      setCurrentColorScheme(newColorScheme === "dark" ? "dark" : "light");
+    }
+
+    // Only sync with server if authenticated
+    if (isAuthenticated && !isSyncing) {
+      setIsSyncing(true);
+      try {
+        await axios.post("/api/user/theme", { colorScheme: newColorScheme });
+      } catch (error) {
+        console.error("Error saving theme preference to server:", error);
+      } finally {
+        setIsSyncing(false);
+      }
+    }
+  };
 
   // Only render children once we've initialized the color scheme
   if (!isInitialized) {
@@ -88,14 +164,24 @@ export function Providers({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <ColorSchemeContext.Provider value={{ colorScheme, setColorScheme }}>
-      <SessionProvider>
-        <QueryClientProvider client={queryClient}>
-          <MantineProvider theme={theme} defaultColorScheme={colorScheme}>
-            {children}
-          </MantineProvider>
-        </QueryClientProvider>
-      </SessionProvider>
+    <ColorSchemeContext.Provider
+      value={{ colorScheme: storedColorScheme, setColorScheme }}
+    >
+      <MantineProvider theme={theme} forceColorScheme={currentColorScheme}>
+        {children}
+      </MantineProvider>
     </ColorSchemeContext.Provider>
+  );
+}
+
+export function Providers({ children }: { children: React.ReactNode }) {
+  const [queryClient] = useState(() => new QueryClient());
+
+  return (
+    <SessionProvider>
+      <QueryClientProvider client={queryClient}>
+        <ThemeProvider>{children}</ThemeProvider>
+      </QueryClientProvider>
+    </SessionProvider>
   );
 }

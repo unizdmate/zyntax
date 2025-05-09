@@ -3,6 +3,7 @@
 import { Box, Button, Group, Title, Tooltip } from "@mantine/core";
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
+import { useColorScheme } from "@/app/providers";
 
 interface TypeScriptOutputProps {
   code: string;
@@ -14,6 +15,21 @@ export function TypeScriptOutput({
   isLoading = false,
 }: TypeScriptOutputProps) {
   const [isCopied, setIsCopied] = useState(false);
+  const { colorScheme } = useColorScheme();
+  
+  // Determine the appropriate Monaco editor theme
+  const editorTheme = colorScheme === "dark" || 
+                      (colorScheme === "auto" && 
+                       typeof window !== "undefined" && 
+                       window.matchMedia("(prefers-color-scheme: dark)").matches) 
+                      ? "vs-dark" : "light";
+  
+  // Determine border color based on theme
+  const borderColor = colorScheme === "dark" || 
+                      (colorScheme === "auto" && 
+                       typeof window !== "undefined" && 
+                       window.matchMedia("(prefers-color-scheme: dark)").matches)
+                      ? "#2C2E33" : "#ced4da";
 
   const handleCopy = async () => {
     try {
@@ -43,11 +59,12 @@ export function TypeScriptOutput({
           </Button>
         </Tooltip>
       </Group>
-      <Box style={{ border: "1px solid #ced4da", borderRadius: "4px" }}>
+      <Box style={{ border: `1px solid ${borderColor}`, borderRadius: "4px" }}>
         <Editor
           height="400px"
           defaultLanguage="typescript"
           value={code}
+          theme={editorTheme}
           options={{
             readOnly: true,
             minimap: { enabled: false },
