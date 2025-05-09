@@ -13,13 +13,30 @@ import {
   Burger,
   Drawer,
   Stack,
-  SegmentedControl,
+  ActionIcon,
+  Tooltip,
+  Box,
+  Flex,
+  ThemeIcon,
+  useMantineTheme,
+  Divider,
+  Avatar,
   rem,
+  Paper,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import Link from "next/link";
 import { useColorScheme } from "@/app/providers";
-import { IconSun, IconMoon, IconDeviceDesktop } from "@tabler/icons-react";
+import {
+  IconSun,
+  IconMoon,
+  IconDeviceDesktop,
+  IconCode,
+  IconBrandGithub,
+  IconChevronDown,
+  IconLogout,
+  IconUser,
+} from "@tabler/icons-react";
 
 export function Header() {
   const { data: session, status } = useSession();
@@ -28,6 +45,7 @@ export function Header() {
   const [opened, { toggle, close }] = useDisclosure(false);
   const [scrolled, setScrolled] = useState(false);
   const { colorScheme, setColorScheme } = useColorScheme();
+  const theme = useMantineTheme();
 
   // Track scroll position for styling
   useEffect(() => {
@@ -44,46 +62,54 @@ export function Header() {
     await signOut({ callbackUrl: "/" });
   };
 
-  // Handle color scheme change with proper typing
-  const handleColorSchemeChange = (value: string) => {
-    // Type guard to ensure value is one of the allowed color schemes
-    if (value === "light" || value === "dark" || value === "auto") {
-      setColorScheme(value);
-    }
-  };
-
   // Determine active links
   const isActive = (path: string) => pathname === path;
 
-  const headerStyle = {
-    position: "sticky" as const,
-    top: 0,
-    zIndex: 100,
-    backgroundColor: colorScheme === "dark" ? "#1A1B1E" : "white",
-    borderBottom: scrolled
-      ? `1px solid ${colorScheme === "dark" ? "#2C2E33" : "#e0e0e0"}`
-      : "none",
-    boxShadow: scrolled
-      ? `0 2px 10px rgba(0, 0, 0, ${colorScheme === "dark" ? "0.3" : "0.05"})`
-      : "none",
-    transition: "box-shadow 200ms ease, border-bottom 200ms ease",
-    padding: "12px 0",
+  // Theme switching logic
+  const isDark =
+    colorScheme === "dark" ||
+    (colorScheme === "auto" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+  const navItemStyles = {
+    display: "block",
+    padding: `${rem(8)} ${rem(12)}`,
+    borderRadius: theme.radius.sm,
+    fontWeight: 500,
+    transition: "all 200ms ease",
   };
 
-  // Navigation items - different for authenticated/unauthenticated users
+  const activeNavItemStyles = {
+    ...navItemStyles,
+    backgroundColor: isDark
+      ? theme.colors.blue[9]
+        ? `rgba(${theme.colors.blue[9]}, 0.2)`
+        : `rgba(0, 0, 0, 0.2)`
+      : theme.colors.blue[0]
+        ? `rgba(${theme.colors.blue[0]}, 0.7)`
+        : `rgba(230, 240, 255, 0.7)`,
+    color: isDark ? theme.colors.blue[3] : theme.colors.blue[7],
+  };
+
+  // Navigation items
   const navItems = (
-    <>
+    <Group gap="md">
       <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-        <UnstyledButton
-          fw={500}
-          style={{
-            color: isActive("/") ? "#1e84ff" : undefined,
-            position: "relative",
-            padding: "8px 12px",
-          }}
-        >
+        <Box style={isActive("/") ? activeNavItemStyles : navItemStyles}>
           Converter
-        </UnstyledButton>
+        </Box>
+      </Link>
+
+      <Link
+        href="/features"
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <Box
+          style={isActive("/features") ? activeNavItemStyles : navItemStyles}
+        >
+          Features
+        </Box>
       </Link>
 
       {status === "authenticated" && (
@@ -91,90 +117,128 @@ export function Header() {
           href="/dashboard"
           style={{ textDecoration: "none", color: "inherit" }}
         >
-          <UnstyledButton
-            fw={500}
-            style={{
-              color: isActive("/dashboard") ? "#1e84ff" : undefined,
-              position: "relative",
-              padding: "8px 12px",
-            }}
+          <Box
+            style={isActive("/dashboard") ? activeNavItemStyles : navItemStyles}
           >
             Dashboard
-          </UnstyledButton>
+          </Box>
         </Link>
       )}
-    </>
+    </Group>
   );
 
-  // Color scheme control
-  const themeSegmentControl = (
-    <SegmentedControl
-      value={colorScheme}
-      onChange={handleColorSchemeChange}
-      data={[
-        {
-          value: "light",
-          label: (
-            <Group gap={4}>
-              <IconSun size={16} />
-              <Text size="sm">Light</Text>
-            </Group>
-          ),
-        },
-        {
-          value: "dark",
-          label: (
-            <Group gap={4}>
-              <IconMoon size={16} />
-              <Text size="sm">Dark</Text>
-            </Group>
-          ),
-        },
-        {
-          value: "auto",
-          label: (
-            <Group gap={4}>
-              <IconDeviceDesktop size={16} />
-              <Text size="sm">Auto</Text>
-            </Group>
-          ),
-        },
-      ]}
-    />
+  // Logo component
+  const Logo = () => (
+    <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
+      <Flex align="center" gap="xs">
+        <ThemeIcon
+          size="lg"
+          radius="md"
+          variant="gradient"
+          gradient={{ from: "blue.7", to: "cyan.5", deg: 45 }}
+        >
+          <IconCode size={18} />
+        </ThemeIcon>
+        <Text
+          fw={700}
+          size="xl"
+          variant="gradient"
+          gradient={{ from: "blue.7", to: "cyan.5", deg: 45 }}
+        >
+          Zyntax
+        </Text>
+      </Flex>
+    </Link>
+  );
+
+  // Theme switcher component
+  const ThemeSwitcher = () => (
+    <Group>
+      <Tooltip label={isDark ? "Light mode" : "Dark mode"}>
+        <ActionIcon
+          onClick={() => setColorScheme(isDark ? "light" : "dark")}
+          variant="light"
+          size="lg"
+          radius="md"
+          aria-label="Toggle color scheme"
+        >
+          {isDark ? <IconSun size="1.2rem" /> : <IconMoon size="1.2rem" />}
+        </ActionIcon>
+      </Tooltip>
+    </Group>
   );
 
   return (
-    <header style={headerStyle}>
-      <Container size="xl">
+    <Box 
+      component="header" 
+      pos="sticky" 
+      top={0} 
+      style={{
+        zIndex: 100,
+        backgroundColor: isDark ? theme.colors.dark[8] : 'white',
+        borderBottom: scrolled ? `${rem(1)} solid ${
+          isDark ? theme.colors.dark[5] : theme.colors.gray[2]
+        }` : 'none',
+        boxShadow: scrolled ? `0 ${rem(2)} ${rem(10)} rgba(0, 0, 0, ${isDark ? 0.3 : 0.05})` : 'none',
+        transition: 'all 200ms ease',
+      }}
+    >
+      <Container size="xl" py="md">
         <Group justify="space-between">
-          <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
-            <Text fw={700} size="xl" c="blue">
-              Zyntax
-            </Text>
-          </Link>
+          <Logo />
 
           {/* Desktop navigation */}
-          <Group gap="sm" visibleFrom="sm">
+          <Group gap="xl" visibleFrom="sm">
             {navItems}
           </Group>
 
           {/* Theme toggle and Authentication controls */}
           <Group gap="md" visibleFrom="sm">
-            {themeSegmentControl}
+            <ThemeSwitcher />
 
             {status === "authenticated" ? (
-              <Menu position="bottom-end" withArrow>
+              <Menu position="bottom-end" withArrow shadow="md" width={200}>
                 <Menu.Target>
-                  <UnstyledButton>
-                    <Text fw={500}>{session.user?.email}</Text>
-                  </UnstyledButton>
+                  <Button
+                    variant="subtle"
+                    rightSection={<IconChevronDown size="1rem" />}
+                  >
+                    <Group gap="xs">
+                      <Avatar size="sm" radius="xl" color="blue">
+                        {session.user?.email?.charAt(0).toUpperCase() || "U"}
+                      </Avatar>
+                      <Text lineClamp={1} size="sm">
+                        {session.user?.email}
+                      </Text>
+                    </Group>
+                  </Button>
                 </Menu.Target>
+
                 <Menu.Dropdown>
-                  <Menu.Item onClick={handleSignOut}>Sign out</Menu.Item>
+                  <Menu.Item
+                    leftSection={<IconUser size="0.9rem" />}
+                    onClick={() => router.push("/profile")}
+                  >
+                    Profile
+                  </Menu.Item>
+                  <Menu.Divider />
+                  <Menu.Item
+                    leftSection={<IconLogout size="0.9rem" />}
+                    onClick={handleSignOut}
+                    color="red"
+                  >
+                    Sign out
+                  </Menu.Item>
                 </Menu.Dropdown>
               </Menu>
             ) : (
-              <Button onClick={() => router.push("/login")}>Sign in</Button>
+              <Button
+                onClick={() => router.push("/login")}
+                variant="gradient"
+                gradient={{ from: "blue", to: "cyan", deg: 45 }}
+              >
+                Sign in
+              </Button>
             )}
           </Group>
 
@@ -192,31 +256,62 @@ export function Header() {
         hiddenFrom="sm"
         zIndex={1000}
         withCloseButton
+        title={<Logo />}
       >
-        <Stack>
-          {navItems}
+        <Stack gap="xl" mt="xl">
+          <Box>{navItems}</Box>
 
-          <div style={{ margin: "20px 0" }}>{themeSegmentControl}</div>
+          <Divider />
+
+          <Group justify="center">
+            <ThemeSwitcher />
+          </Group>
+
+          <Divider />
 
           {status === "authenticated" ? (
-            <>
-              <Text fw={500}>{session.user?.email}</Text>
-              <Button onClick={handleSignOut} variant="subtle">
-                Sign out
-              </Button>
-            </>
+            <Stack>
+              <Paper withBorder p="md" radius="md">
+                <Group mb="xs">
+                  <Avatar size="md" radius="xl" color="blue">
+                    {session.user?.email?.charAt(0).toUpperCase() || "U"}
+                  </Avatar>
+                  <Box>
+                    <Text fw={500} size="sm" lineClamp={1}>
+                      {session.user?.email}
+                    </Text>
+                    <Text size="xs" c="dimmed">
+                      Signed in
+                    </Text>
+                  </Box>
+                </Group>
+                <Button
+                  onClick={handleSignOut}
+                  variant="light"
+                  color="red"
+                  fullWidth
+                  leftSection={<IconLogout size="1rem" />}
+                >
+                  Sign out
+                </Button>
+              </Paper>
+            </Stack>
           ) : (
             <Button
               onClick={() => {
                 close();
                 router.push("/login");
               }}
+              variant="gradient"
+              gradient={{ from: "blue", to: "cyan", deg: 45 }}
+              fullWidth
+              size="md"
             >
               Sign in
             </Button>
           )}
         </Stack>
       </Drawer>
-    </header>
+    </Box>
   );
 }
