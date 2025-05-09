@@ -55,7 +55,9 @@ export default function Home() {
   const { colorScheme } = useColorScheme();
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("tryIt");
+  const [conversionTitle, setConversionTitle] = useState<string>("Untitled Conversion");
   const [options, setOptions] = useState<ConversionOptionsType>({
     interfaceName: "RootObject",
     useType: false,
@@ -76,20 +78,22 @@ export default function Home() {
 
   const handleJsonSubmit = async (jsonContent: string) => {
     setError(null);
+    setSuccessMessage(null);
 
     try {
       const result = await createConversionMutation.mutateAsync({
         inputJson: jsonContent,
         options,
         language: OutputLanguage.TYPESCRIPT,
+        title: conversionTitle,
       });
 
       // Update the output with the converted code
       setOutput(result.outputCode);
 
-      // If user is logged in and conversion was saved, redirect to the conversion page
+      // Show success message instead of redirecting
       if (status === "authenticated" && result.id) {
-        router.push(`/conversion/${result.id}`);
+        setSuccessMessage(`Conversion "${conversionTitle}" saved successfully!`);
       }
     } catch (err) {
       setError((err as Error).message || "An error occurred");
@@ -381,6 +385,9 @@ export interface User {
               <ConversionOptions
                 options={options}
                 onChange={handleOptionsChange}
+                conversionTitle={conversionTitle}
+                onTitleChange={setConversionTitle}
+                isAuthenticated={status === "authenticated"}
               />
             </Paper>
 
@@ -409,6 +416,28 @@ export interface User {
                 mt="md"
               >
                 {error}
+              </Alert>
+            )}
+
+            {successMessage && (
+              <Alert
+                icon={<IconCheck size="1rem" />}
+                color="green"
+                title="Success"
+                mt="md"
+              >
+                <Group align="center" gap="xs">
+                  <Text>{successMessage}</Text>
+                  {status === "authenticated" && (
+                    <Button
+                      variant="light"
+                      size="xs"
+                      onClick={() => router.push("/dashboard")}
+                    >
+                      View in Dashboard
+                    </Button>
+                  )}
+                </Group>
               </Alert>
             )}
           </Stack>

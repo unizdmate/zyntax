@@ -20,11 +20,17 @@ import { useState } from "react";
 interface ConversionOptionsProps {
   options: ConversionOptionsType;
   onChange: (options: ConversionOptionsType) => void;
+  conversionTitle?: string;
+  onTitleChange?: (title: string) => void;
+  isAuthenticated?: boolean; // Add authentication state prop
 }
 
 export function ConversionOptions({
   options,
   onChange,
+  conversionTitle = "Untitled Conversion",
+  onTitleChange,
+  isAuthenticated = false, // Default to false if not provided
 }: ConversionOptionsProps) {
   const [localOptions, setLocalOptions] =
     useState<ConversionOptionsType>(options);
@@ -51,6 +57,16 @@ export function ConversionOptions({
         Options
       </Title>
       <Stack gap="xs">
+        {/* Only show title field for authenticated users */}
+        {isAuthenticated && (
+          <TextInput
+            label="Conversion Title"
+            placeholder="Untitled Conversion"
+            value={conversionTitle}
+            onChange={(e) => onTitleChange?.(e.target.value)}
+          />
+        )}
+
         <TextInput
           label="Interface/Type Name"
           placeholder="RootObject"
