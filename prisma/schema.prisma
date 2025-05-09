@@ -1,0 +1,32 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Added direct connection for migrations
+}
+
+model User {
+  id            String       @id @default(uuid())
+  email         String       @unique
+  colorScheme   String?      @default("light") // Added theme preference field
+  conversions   Conversion[]
+  createdAt     DateTime     @default(now())
+}
+
+model Conversion {
+  id            String    @id @default(uuid())
+  userId        String?
+  user          User?     @relation(fields: [userId], references: [id])
+  title         String?   @default("Untitled")
+  inputJson     String    @db.Text
+  outputCode    String    @db.Text
+  language      String    // e.g. "TypeScript", "Python"
+  conversionType String   // e.g. "JSON_TO_TS", "JS_TO_PY"
+  createdAt     DateTime  @default(now())
+}
