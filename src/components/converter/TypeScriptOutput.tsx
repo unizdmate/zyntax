@@ -16,20 +16,24 @@ export function TypeScriptOutput({
 }: TypeScriptOutputProps) {
   const [isCopied, setIsCopied] = useState(false);
   const { colorScheme } = useColorScheme();
-  
+
   // Determine the appropriate Monaco editor theme
-  const editorTheme = colorScheme === "dark" || 
-                      (colorScheme === "auto" && 
-                       typeof window !== "undefined" && 
-                       window.matchMedia("(prefers-color-scheme: dark)").matches) 
-                      ? "vs-dark" : "light";
-  
+  const editorTheme =
+    colorScheme === "dark" ||
+    (colorScheme === "auto" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ? "vs-dark"
+      : "light";
+
   // Determine border color based on theme
-  const borderColor = colorScheme === "dark" || 
-                      (colorScheme === "auto" && 
-                       typeof window !== "undefined" && 
-                       window.matchMedia("(prefers-color-scheme: dark)").matches)
-                      ? "#2C2E33" : "#ced4da";
+  const borderColor =
+    colorScheme === "dark" ||
+    (colorScheme === "auto" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches)
+      ? "#2C2E33"
+      : "#ced4da";
 
   const handleCopy = async () => {
     try {

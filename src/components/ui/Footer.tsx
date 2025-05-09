@@ -1,16 +1,23 @@
 "use client";
 
-import { Container, Group, Text, Stack, useMantineColorScheme } from "@mantine/core";
+import {
+  Container,
+  Group,
+  Text,
+  Stack,
+  useMantineColorScheme,
+} from "@mantine/core";
 import Link from "next/link";
 import { useColorScheme } from "@/app/providers";
 
 export function Footer() {
   const currentYear = new Date().getFullYear();
   const { colorScheme } = useColorScheme();
-  const isDark = colorScheme === "dark" || 
-                (colorScheme === "auto" && 
-                 typeof window !== "undefined" && 
-                 window.matchMedia("(prefers-color-scheme: dark)").matches);
+  const isDark =
+    colorScheme === "dark" ||
+    (colorScheme === "auto" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   return (
     <footer
