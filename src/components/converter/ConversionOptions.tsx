@@ -134,6 +134,17 @@ export function ConversionOptions({
             }
           />
         </Group>
+
+        <Group>
+          <Checkbox
+            label="Extract nested types"
+            checked={localOptions.extractNestedTypes ?? false}
+            onChange={(e) =>
+              handleChange("extractNestedTypes", e.currentTarget.checked)
+            }
+            description="Create separate interfaces/types for nested objects"
+          />
+        </Group>
       </Stack>
     </Box>
   );

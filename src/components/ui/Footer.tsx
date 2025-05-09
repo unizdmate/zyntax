@@ -158,14 +158,16 @@ export function Footer() {
                       href={link.href}
                       style={{ textDecoration: "none" }}
                     >
-                      <Text 
-                        size="sm" 
-                        c="dimmed" 
-                        style={{ 
-                          '&:hover': { 
-                            color: isDark ? theme.colors.blue[4] : theme.colors.blue[7],
+                      <Text
+                        size="sm"
+                        c="dimmed"
+                        style={{
+                          "&:hover": {
+                            color: isDark
+                              ? theme.colors.blue[4]
+                              : theme.colors.blue[7],
                           },
-                          transition: 'color 150ms ease',
+                          transition: "color 150ms ease",
                         }}
                       >
                         {link.label}

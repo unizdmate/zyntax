@@ -24,6 +24,7 @@ const ConversionRequestSchema = z.object({
       ExportStrategy.ALL
     ]).optional(),
     indentationSpaces: z.number().optional(),
+    extractNestedTypes: z.boolean().optional(),
   }).optional(),
 });
 

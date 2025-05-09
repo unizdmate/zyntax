@@ -97,9 +97,23 @@ export function Header() {
     <Group gap="md">
       <Link href="/" style={{ textDecoration: "none", color: "inherit" }}>
         <Box style={isActive("/") ? activeNavItemStyles : navItemStyles}>
-          Converter
+          Home
         </Box>
       </Link>
+
+      {status === "authenticated" ? (
+        <Link href="/converter" style={{ textDecoration: "none", color: "inherit" }}>
+          <Box style={isActive("/converter") ? activeNavItemStyles : navItemStyles}>
+            Converter
+          </Box>
+        </Link>
+      ) : (
+        <Link href="/#try-converter" style={{ textDecoration: "none", color: "inherit" }}>
+          <Box style={navItemStyles}>
+            Converter
+          </Box>
+        </Link>
+      )}
 
       <Link
         href="/features"
@@ -169,18 +183,22 @@ export function Header() {
   );
 
   return (
-    <Box 
-      component="header" 
-      pos="sticky" 
-      top={0} 
+    <Box
+      component="header"
+      pos="sticky"
+      top={0}
       style={{
         zIndex: 100,
-        backgroundColor: isDark ? theme.colors.dark[8] : 'white',
-        borderBottom: scrolled ? `${rem(1)} solid ${
-          isDark ? theme.colors.dark[5] : theme.colors.gray[2]
-        }` : 'none',
-        boxShadow: scrolled ? `0 ${rem(2)} ${rem(10)} rgba(0, 0, 0, ${isDark ? 0.3 : 0.05})` : 'none',
-        transition: 'all 200ms ease',
+        backgroundColor: isDark ? theme.colors.dark[8] : "white",
+        borderBottom: scrolled
+          ? `${rem(1)} solid ${
+              isDark ? theme.colors.dark[5] : theme.colors.gray[2]
+            }`
+          : "none",
+        boxShadow: scrolled
+          ? `0 ${rem(2)} ${rem(10)} rgba(0, 0, 0, ${isDark ? 0.3 : 0.05})`
+          : "none",
+        transition: "all 200ms ease",
       }}
     >
       <Container size="xl" py="md">

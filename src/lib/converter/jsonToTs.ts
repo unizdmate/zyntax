@@ -10,6 +10,7 @@ type ConversionOptions = {
   useSemicolons?: boolean;
   exportStrategy?: ExportStrategy;
   indentationSpaces?: number;
+  extractNestedTypes?: boolean;
 };
 
 /**
@@ -31,8 +32,22 @@ export function convertJsonToTypeScript(
       useSemicolons = true,
       exportStrategy = ExportStrategy.ALL,
       indentationSpaces = 2,
+      extractNestedTypes = true, // Default to true for backward compatibility
     } = options;
 
+    // If extractNestedTypes is false, use the nested type definition approach
+    if (!extractNestedTypes) {
+      return generateNestedTypeDefinition(
+        parsedJson,
+        interfaceName,
+        useType,
+        useInterfaces,
+        useSemicolons,
+        indentationSpaces
+      );
+    }
+
+    // Otherwise, continue with the separated types approach
     // Collection of generated types/interfaces and a set to track used names
     const generatedTypes = new Map<string, string>();
     const usedTypeNames = new Set<string>();
@@ -92,7 +107,13 @@ function generateNestedTypeDefinition(
     
     // Start building the root type
     const lines: string[] = [];
-    lines.push(`export ${declarationType} ${rootName} {`);
+    
+    // Add equals sign for type definitions but not for interfaces
+    if (declarationType === 'type') {
+      lines.push(`export ${declarationType} ${rootName} = {`);
+    } else {
+      lines.push(`export ${declarationType} ${rootName} {`);
+    }
     
     // Process each top-level property and generate nested interfaces
     for (const [key, value] of Object.entries(obj)) {

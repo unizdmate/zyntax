@@ -57,7 +57,9 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<string>("tryIt");
-  const [conversionTitle, setConversionTitle] = useState<string>("Untitled Conversion");
+  const [conversionTitle, setConversionTitle] = useState<string>(
+    "Untitled Conversion"
+  );
   const [options, setOptions] = useState<ConversionOptionsType>({
     interfaceName: "RootObject",
     useType: false,
@@ -93,7 +95,9 @@ export default function Home() {
 
       // Show success message instead of redirecting
       if (status === "authenticated" && result.id) {
-        setSuccessMessage(`Conversion "${conversionTitle}" saved successfully!`);
+        setSuccessMessage(
+          `Conversion "${conversionTitle}" saved successfully!`
+        );
       }
     } catch (err) {
       setError((err as Error).message || "An error occurred");

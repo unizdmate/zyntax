@@ -35,6 +35,7 @@ export interface ConversionOptions {
   useSemicolons?: boolean;
   exportStrategy?: ExportStrategy;
   indentationSpaces?: number;
+  extractNestedTypes?: boolean; // New option to extract nested types into separate interfaces/types
 }
 
 export interface Conversion {
