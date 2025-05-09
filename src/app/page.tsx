@@ -271,12 +271,7 @@ export default function Home() {
                     Try It Now
                   </Button>
 
-                  <Button
-                    component="a"
-                    href="/login"
-                    variant="light"
-                    size="lg"
-                  >
+                  <Button component="a" href="/login" variant="light" size="lg">
                     Create Free Account
                   </Button>
                 </Group>
@@ -298,9 +293,7 @@ export default function Home() {
                       ? theme.colors.blue[2]
                       : theme.colors.blue[8],
                     border: `1px solid ${
-                      isDarkMode
-                        ? theme.colors.dark[5]
-                        : theme.colors.gray[3]
+                      isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]
                     }`,
                   }}
                 >
@@ -361,7 +354,7 @@ export interface User {
         </SimpleGrid>
       </Container>
 
-      {/* Converter Section with Tabs */}
+      {/* Converter Section - Options Above Editors */}
       <Box
         py={60}
         id="try-converter"
@@ -372,52 +365,53 @@ export interface User {
         }}
       >
         <Container size="xl">
-          <Title order={2} size={36} ta="center" mb="xl">
+          <Title order={2} size={36} ta="center" mb="md">
             Try The Converter
           </Title>
+          <Text size="lg" c="dimmed" ta="center" mb="xl" maw={700} mx="auto">
+            Convert your JSON to TypeScript with custom options
+          </Text>
 
-          <Tabs value={activeTab} onChange={handleTabChange} mb="xl">
-            <Tabs.List grow>
-              <Tabs.Tab value="tryIt">Try It</Tabs.Tab>
-              <Tabs.Tab value="options">Customize Options</Tabs.Tab>
-            </Tabs.List>
-
-            <Tabs.Panel value="tryIt" pt="xl">
-              <Grid>
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <JsonInput
-                    onSubmit={handleJsonSubmit}
-                    isLoading={createConversionMutation.isPending}
-                  />
-                </Grid.Col>
-
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <TypeScriptOutput
-                    code={output}
-                    isLoading={createConversionMutation.isPending}
-                  />
-                </Grid.Col>
-              </Grid>
-
-              {error && (
-                <Alert
-                  icon={<IconAlertCircle size="1rem" />}
-                  color="red"
-                  title="Error"
-                  mt="md"
-                >
-                  {error}
-                </Alert>
-              )}
-            </Tabs.Panel>
-
-            <Tabs.Panel value="options" pt="xl">
+          <Stack gap="xl">
+            {/* Options Panel */}
+            <Paper p="md" withBorder radius="md">
+              <Title order={4} mb="md">
+                Customize Options
+              </Title>
               <ConversionOptions
                 options={options}
                 onChange={handleOptionsChange}
               />
-            </Tabs.Panel>
-          </Tabs>
+            </Paper>
+
+            {/* Editors */}
+            <Grid>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <JsonInput
+                  onSubmit={handleJsonSubmit}
+                  isLoading={createConversionMutation.isPending}
+                />
+              </Grid.Col>
+
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TypeScriptOutput
+                  code={output}
+                  isLoading={createConversionMutation.isPending}
+                />
+              </Grid.Col>
+            </Grid>
+
+            {error && (
+              <Alert
+                icon={<IconAlertCircle size="1rem" />}
+                color="red"
+                title="Error"
+                mt="md"
+              >
+                {error}
+              </Alert>
+            )}
+          </Stack>
         </Container>
       </Box>
 
@@ -530,8 +524,8 @@ export interface User {
               ? theme.colors.dark[9]
               : "#1A1B1E"
             : theme.colors.blue[0]
-            ? "#e7f5ff" // Hardcoded light blue color instead of using theme.fn
-            : "#e7f5ff",
+              ? "#e7f5ff" // Hardcoded light blue color instead of using theme.fn
+              : "#e7f5ff",
           position: "relative",
         }}
       >
