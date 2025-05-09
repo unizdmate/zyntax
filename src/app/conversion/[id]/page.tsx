@@ -11,48 +11,73 @@ import {
   Group,
   Text,
   Badge,
+  TextInput,
+  Modal,
+  LoadingOverlay,
+  Alert,
 } from "@mantine/core";
-import { Conversion } from "@/types";
+import { useDisclosure } from "@mantine/hooks";
+import { useSession } from "next-auth/react";
 import { JsonInput } from "@/components/converter/JsonInput";
 import { TypeScriptOutput } from "@/components/converter/TypeScriptOutput";
-import { ConversionOptions } from "@/components/converter/ConversionOptions";
+import {
+  useConversion,
+  useDeleteConversion,
+  useUpdateConversion,
+} from "@/data/use-conversions";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 export default function ConversionPage() {
   const params = useParams();
   const router = useRouter();
-  const [conversion, setConversion] = useState<Conversion | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const id = params.id as string;
+  const { data: session } = useSession();
+  const [title, setTitle] = useState("");
 
+  // React Query hooks
+  const { data: conversion, isLoading, error } = useConversion(id);
+
+  const updateMutation = useUpdateConversion();
+  const deleteMutation = useDeleteConversion();
+
+  // Modal states
+  const [editModalOpened, { open: openEditModal, close: closeEditModal }] =
+    useDisclosure(false);
+  const [
+    deleteModalOpened,
+    { open: openDeleteModal, close: closeDeleteModal },
+  ] = useDisclosure(false);
+
+  // Check if current user owns the conversion
+  const isOwner = session?.user?.id && conversion?.userId === session.user.id;
+
+  // Set initial title when conversion data loads
   useEffect(() => {
-    if (params.id) {
-      fetchConversion(params.id as string);
+    if (conversion) {
+      setTitle(conversion.title || "Untitled Conversion");
     }
-  }, [params.id]);
+  }, [conversion]);
 
-  const fetchConversion = async (id: string) => {
-    try {
-      setIsLoading(true);
-      const response = await fetch(`/api/conversions/${id}`);
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to fetch conversion");
+  const handleSaveTitle = async () => {
+    updateMutation.mutate(
+      { id, title },
+      {
+        onSuccess: () => {
+          closeEditModal();
+        },
       }
-
-      if (data.success && data.data) {
-        setConversion(data.data);
-      } else {
-        setError("Conversion not found");
-      }
-    } catch (err) {
-      setError((err as Error).message || "An error occurred");
-      console.error("Error fetching conversion:", err);
-    } finally {
-      setIsLoading(false);
-    }
+    );
   };
 
+  const handleDeleteConversion = async () => {
+    deleteMutation.mutate(id, {
+      onSuccess: () => {
+        router.push("/dashboard");
+      },
+    });
+  };
+
+  // Loading state
   if (isLoading) {
     return (
       <Container size="xl" py="xl">
@@ -65,18 +90,22 @@ export default function ConversionPage() {
             <Skeleton height={400} mb="xl" />
           </Grid.Col>
         </Grid>
-        <Skeleton height={200} />
       </Container>
     );
   }
 
+  // Error state
   if (error || !conversion) {
     return (
       <Container size="md" py="xl">
-        <Title order={2} mb="lg">
-          Error
-        </Title>
-        <Text mb="lg">{error || "Conversion not found"}</Text>
+        <Alert
+          icon={<IconAlertCircle size="1rem" />}
+          title="Error"
+          color="red"
+          mb="lg"
+        >
+          {error instanceof Error ? error.message : "Conversion not found"}
+        </Alert>
         <Button onClick={() => router.push("/dashboard")}>
           Return to Dashboard
         </Button>
@@ -86,6 +115,57 @@ export default function ConversionPage() {
 
   return (
     <Container size="xl" py="xl">
+      {/* Edit Title Modal */}
+      <Modal
+        opened={editModalOpened}
+        onClose={closeEditModal}
+        title="Edit Conversion Title"
+        centered
+      >
+        <LoadingOverlay visible={updateMutation.isPending} />
+        <TextInput
+          label="Title"
+          placeholder="Enter a title for your conversion"
+          value={title}
+          onChange={(e) => setTitle(e.currentTarget.value)}
+          mb="md"
+        />
+        <Group justify="flex-end">
+          <Button variant="outline" onClick={closeEditModal}>
+            Cancel
+          </Button>
+          <Button onClick={handleSaveTitle} disabled={updateMutation.isPending}>
+            Save
+          </Button>
+        </Group>
+      </Modal>
+
+      {/* Delete Confirmation Modal */}
+      <Modal
+        opened={deleteModalOpened}
+        onClose={closeDeleteModal}
+        title="Delete Conversion"
+        centered
+      >
+        <LoadingOverlay visible={deleteMutation.isPending} />
+        <Text mb="lg">
+          Are you sure you want to delete this conversion? This action cannot be
+          undone.
+        </Text>
+        <Group justify="flex-end">
+          <Button variant="outline" onClick={closeDeleteModal}>
+            Cancel
+          </Button>
+          <Button
+            color="red"
+            onClick={handleDeleteConversion}
+            disabled={deleteMutation.isPending}
+          >
+            Delete
+          </Button>
+        </Group>
+      </Modal>
+
       <Group justify="space-between" mb="xl">
         <div>
           <Title>{conversion.title || "Untitled Conversion"}</Title>
@@ -95,6 +175,18 @@ export default function ConversionPage() {
         </div>
         <Group>
           <Badge size="lg">{conversion.language}</Badge>
+
+          {isOwner && (
+            <>
+              <Button variant="outline" onClick={openEditModal}>
+                Edit Title
+              </Button>
+              <Button variant="outline" color="red" onClick={openDeleteModal}>
+                Delete
+              </Button>
+            </>
+          )}
+
           <Button variant="outline" onClick={() => router.push("/dashboard")}>
             Back to Dashboard
           </Button>

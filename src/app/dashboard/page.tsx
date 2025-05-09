@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import {
@@ -14,42 +13,31 @@ import {
   Button,
   Grid,
   Skeleton,
+  Alert,
 } from "@mantine/core";
-import { Conversion } from "@/types";
+import { IconAlertCircle } from "@tabler/icons-react";
+import { useConversions } from "@/data/use-conversions";
 
 export default function DashboardPage() {
   const { data: session, status } = useSession();
   const router = useRouter();
-  const [conversions, setConversions] = useState<Conversion[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    // Redirect if not authenticated
-    if (status === "unauthenticated") {
-      router.push("/login");
-    }
+  // Use the React Query hook for fetching conversions
+  const {
+    data: conversions = [],
+    isLoading,
+    error,
+  } = useConversions({
+    enabled: status === "authenticated",
+  });
 
-    // Fetch user's conversion history
-    if (status === "authenticated") {
-      fetchConversions();
-    }
-  }, [status, router]);
+  // Redirect if not authenticated
+  if (status === "unauthenticated") {
+    router.push("/login");
+    return null;
+  }
 
-  const fetchConversions = async () => {
-    try {
-      const response = await fetch("/api/conversions");
-      const data = await response.json();
-
-      if (data.success && data.data) {
-        setConversions(data.data);
-      }
-    } catch (error) {
-      console.error("Failed to fetch conversions:", error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
+  // Loading state
   if (status === "loading" || isLoading) {
     return (
       <Container size="lg" py="xl">
@@ -61,6 +49,26 @@ export default function DashboardPage() {
             </Grid.Col>
           ))}
         </Grid>
+      </Container>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <Container size="lg" py="xl">
+        <Title mb="xl">Your Conversions</Title>
+        <Alert
+          icon={<IconAlertCircle size="1rem" />}
+          title="Error"
+          color="red"
+          mb="lg"
+        >
+          {error instanceof Error
+            ? error.message
+            : "Failed to load conversions"}
+        </Alert>
+        <Button onClick={() => router.push("/")}>Go to Converter</Button>
       </Container>
     );
   }

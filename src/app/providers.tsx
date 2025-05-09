@@ -5,7 +5,7 @@ import { SessionProvider, useSession } from "next-auth/react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { useState, useEffect, createContext, useContext } from "react";
 import { useLocalStorage } from "usehooks-ts";
-import axios from "axios";
+import { useUpdateUserTheme, useUserTheme } from "@/data/use-auth";
 
 // Create a context for color scheme management
 type ColorScheme = "light" | "dark" | "auto";
@@ -52,9 +52,33 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
   const [storedColorScheme, setStoredColorScheme] =
     useLocalStorage<ColorScheme>("zyntax-color-scheme", "light");
 
-  // State to track if we're currently syncing with server
-  const [isSyncing, setIsSyncing] = useState(false);
+  // State to track initialization
   const [isInitialized, setIsInitialized] = useState(false);
+
+  // React Query hooks for theme operations
+  const themeQuery = useUserTheme({
+    enabled: isAuthenticated,
+  });
+
+  const themeMutation = useUpdateUserTheme();
+
+  // Handle theme query success
+  useEffect(() => {
+    if (themeQuery.isSuccess && themeQuery.data) {
+      // Only update if different from current value
+      if (themeQuery.data.colorScheme !== storedColorScheme) {
+        setStoredColorScheme(themeQuery.data.colorScheme as ColorScheme);
+      }
+      if (!isInitialized) setIsInitialized(true);
+    }
+  }, [themeQuery.isSuccess, themeQuery.data, storedColorScheme, isInitialized]);
+
+  // Handle theme query error
+  useEffect(() => {
+    if (themeQuery.isError && !isInitialized) {
+      setIsInitialized(true);
+    }
+  }, [themeQuery.isError, isInitialized]);
 
   // Keep a local state for immediate UI updates
   const [currentColorScheme, setCurrentColorScheme] = useState<
@@ -95,40 +119,19 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
     }
   }, [storedColorScheme]);
 
-  // Sync with server on authentication status change
+  // Sync with server when local preference changes and user is authenticated
   useEffect(() => {
-    const syncWithServer = async () => {
-      if (isAuthenticated && !isSyncing) {
-        setIsSyncing(true);
-        try {
-          // First try to get user preference from server
-          const response = await axios.get("/api/user/theme");
-          if (response.data?.success && response.data?.data?.colorScheme) {
-            const serverScheme = response.data.data.colorScheme as ColorScheme;
-            // Update local storage if server has different value
-            if (serverScheme !== storedColorScheme) {
-              setStoredColorScheme(serverScheme);
-            }
-          } else {
-            // If no server preference, sync local preference to server
-            await axios.post("/api/user/theme", {
-              colorScheme: storedColorScheme,
-            });
-          }
-        } catch (error) {
-          console.error("Error syncing theme with server:", error);
-        } finally {
-          setIsSyncing(false);
-          setIsInitialized(true);
-        }
-      } else {
-        // For unauthenticated users, just ensure localStorage value is applied
-        setIsInitialized(true);
-      }
-    };
+    if (isAuthenticated && isInitialized) {
+      themeMutation.mutate(storedColorScheme);
+    }
+  }, [isAuthenticated, storedColorScheme, isInitialized]);
 
-    syncWithServer();
-  }, [isAuthenticated, storedColorScheme]);
+  // Initialize for unauthenticated users
+  useEffect(() => {
+    if (!isAuthenticated && !isInitialized) {
+      setIsInitialized(true);
+    }
+  }, [isAuthenticated, isInitialized]);
 
   // Function to save color scheme preference
   const setColorScheme = async (newColorScheme: ColorScheme) => {
@@ -145,17 +148,7 @@ function ThemeProvider({ children }: { children: React.ReactNode }) {
       setCurrentColorScheme(newColorScheme === "dark" ? "dark" : "light");
     }
 
-    // Only sync with server if authenticated
-    if (isAuthenticated && !isSyncing) {
-      setIsSyncing(true);
-      try {
-        await axios.post("/api/user/theme", { colorScheme: newColorScheme });
-      } catch (error) {
-        console.error("Error saving theme preference to server:", error);
-      } finally {
-        setIsSyncing(false);
-      }
-    }
+    // Server sync happens through the useEffect
   };
 
   // Only render children once we've initialized the color scheme

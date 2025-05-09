@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { convertJsonToTypeScript } from "@/lib/converter/jsonToTs";
-import { ConversionType, OutputLanguage } from "@/types";
+import { ConversionType, OutputLanguage, ExportStrategy } from "@/types";
 import { PrismaClient } from "@prisma/client";
 import { getServerSession } from "next-auth/next";
 import { z } from "zod";
@@ -18,7 +18,11 @@ const ConversionRequestSchema = z.object({
     useType: z.boolean().optional(),
     useInterfaces: z.boolean().optional(),
     useSemicolons: z.boolean().optional(),
-    exportStrategy: z.string().optional(),  // Changed from useExport to exportStrategy
+    exportStrategy: z.enum([
+      ExportStrategy.NONE, 
+      ExportStrategy.TOP_LEVEL, 
+      ExportStrategy.ALL
+    ]).optional(),
     indentationSpaces: z.number().optional(),
   }).optional(),
 });

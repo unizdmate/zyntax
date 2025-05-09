@@ -16,17 +16,18 @@ import {
 import { JsonInput } from "@/components/converter/JsonInput";
 import { TypeScriptOutput } from "@/components/converter/TypeScriptOutput";
 import { ConversionOptions } from "@/components/converter/ConversionOptions";
+import { useCreateConversion } from "@/data/use-conversions";
 import {
   ConversionOptions as ConversionOptionsType,
   OutputLanguage,
   ExportStrategy,
 } from "@/types";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 export default function Home() {
   const router = useRouter();
   const { status } = useSession();
   const [output, setOutput] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [options, setOptions] = useState<ConversionOptionsType>({
     interfaceName: "RootObject",
@@ -37,46 +38,29 @@ export default function Home() {
     indentationSpaces: 2,
   });
 
+  // Use React Query hook for creating conversions
+  const createConversionMutation = useCreateConversion();
+
   const handleJsonSubmit = async (jsonContent: string) => {
-    setIsLoading(true);
     setError(null);
 
     try {
-      const response = await fetch("/api/convert", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          inputJson: jsonContent,
-          language: OutputLanguage.TYPESCRIPT,
-          options,
-        }),
+      const result = await createConversionMutation.mutateAsync({
+        inputJson: jsonContent,
+        options,
+        language: OutputLanguage.TYPESCRIPT,
       });
 
-      const data = await response.json();
+      // Update the output with the converted code
+      setOutput(result.outputCode);
 
-      if (!response.ok) {
-        throw new Error(data.error || "Failed to convert JSON");
-      }
-
-      if (data.success && data.data?.outputCode) {
-        setOutput(data.data.outputCode);
-
-        // If user is logged in and conversion was saved, redirect to the conversion page
-        if (status === "authenticated" && data.data.id) {
-          router.push(`/conversion/${data.data.id}`);
-        }
-      } else {
-        setError(
-          "Failed to convert JSON. Please check your input and try again."
-        );
+      // If user is logged in and conversion was saved, redirect to the conversion page
+      if (status === "authenticated" && result.id) {
+        router.push(`/conversion/${result.id}`);
       }
     } catch (err) {
       setError((err as Error).message || "An error occurred");
       console.error("Conversion error:", err);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -95,18 +79,29 @@ export default function Home() {
         </Box>
 
         {error && (
-          <Alert color="red" title="Error" mb="md">
+          <Alert
+            icon={<IconAlertCircle size="1rem" />}
+            color="red"
+            title="Error"
+            mb="md"
+          >
             {error}
           </Alert>
         )}
 
         <Grid>
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <JsonInput onSubmit={handleJsonSubmit} isLoading={isLoading} />
+            <JsonInput
+              onSubmit={handleJsonSubmit}
+              isLoading={createConversionMutation.isPending}
+            />
           </Grid.Col>
 
           <Grid.Col span={{ base: 12, md: 6 }}>
-            <TypeScriptOutput code={output} isLoading={isLoading} />
+            <TypeScriptOutput
+              code={output}
+              isLoading={createConversionMutation.isPending}
+            />
           </Grid.Col>
         </Grid>
 
