@@ -2,6 +2,7 @@
  * JSON to TypeScript converter utility
  */
 import { ExportStrategy } from "@/types";
+import { stripJsonComments } from "./jsonUtils";
 
 type ConversionOptions = {
   interfaceName?: string;
@@ -21,8 +22,11 @@ export function convertJsonToTypeScript(
   options: ConversionOptions = {}
 ): { code: string; error?: null } | { code: null; error: string } {
   try {
-    // Parse the JSON
-    const parsedJson = JSON.parse(json);
+    // Strip comments from the JSON string before parsing
+    const cleanedJson = stripJsonComments(json);
+    
+    // Parse the cleaned JSON
+    const parsedJson = JSON.parse(cleanedJson);
     
     // Default options
     const {
@@ -62,7 +66,8 @@ export function convertJsonToTypeScript(
         useInterfaces, 
         useSemicolons, 
         exportStrategy, 
-        indentationSpaces 
+        indentationSpaces,
+        extractNestedTypes
       },
       generatedTypes,
       usedTypeNames,

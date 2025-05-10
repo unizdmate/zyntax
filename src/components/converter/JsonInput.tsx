@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Box, Button, Group, Text, Title } from "@mantine/core";
 import Editor from "@monaco-editor/react";
 import { useColorScheme } from "@/app/providers";
+import { stripJsonComments, validateJson } from "@/lib/converter/jsonUtils";
 
 interface JsonInputProps {
   onSubmit: (jsonContent: string) => void;
@@ -46,17 +47,51 @@ export function JsonInput({
       : "#ced4da";
 
   const handleEditorChange = (value: string | undefined) => {
-    setJsonContent(value || "");
+    const newContent = value || "";
+    setJsonContent(newContent);
+    
+    // Clear previous error
     setError(null);
+    
+    // Only validate when there's actual content
+    if (newContent.trim().length > 0) {
+      try {
+        // Try to strip comments - this won't throw even if JSON is invalid
+        stripJsonComments(newContent);
+      } catch (err) {
+        setError(`Error processing JSON: ${(err as Error).message}`);
+      }
+    }
+  };
+
+  // Handle pasting into the editor
+  const handleEditorDidMount = (editor: any) => {
+    editor.onDidPaste(() => {
+      const content = editor.getValue();
+      try {
+        // When content is pasted, strip comments immediately
+        const strippedContent = stripJsonComments(content);
+        
+        // Only update the editor content if it actually changed
+        if (strippedContent !== content) {
+          editor.setValue(strippedContent);
+        }
+      } catch (err) {
+        // Don't set error here as the handleEditorChange will be triggered with the new value
+      }
+    });
   };
 
   const validateAndSubmit = () => {
-    try {
-      JSON.parse(jsonContent);
+    const result = validateJson(jsonContent);
+    
+    if (result.isValid) {
       setError(null);
-      onSubmit(jsonContent);
-    } catch (err) {
-      setError(`Invalid JSON: ${(err as Error).message}`);
+      // If the JSON had comments, use the cleaned version for the conversion
+      const cleanedJson = stripJsonComments(jsonContent);
+      onSubmit(cleanedJson);
+    } else {
+      setError(`Invalid JSON: ${result.error}`);
     }
   };
 
@@ -74,6 +109,7 @@ export function JsonInput({
           defaultLanguage="json"
           value={jsonContent}
           onChange={handleEditorChange}
+          onMount={handleEditorDidMount}
           theme={editorTheme}
           options={{
             minimap: { enabled: false },
