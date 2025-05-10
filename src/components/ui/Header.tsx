@@ -102,16 +102,22 @@ export function Header() {
       </Link>
 
       {status === "authenticated" ? (
-        <Link href="/converter" style={{ textDecoration: "none", color: "inherit" }}>
-          <Box style={isActive("/converter") ? activeNavItemStyles : navItemStyles}>
+        <Link
+          href="/converter"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <Box
+            style={isActive("/converter") ? activeNavItemStyles : navItemStyles}
+          >
             Converter
           </Box>
         </Link>
       ) : (
-        <Link href="/#try-converter" style={{ textDecoration: "none", color: "inherit" }}>
-          <Box style={navItemStyles}>
-            Converter
-          </Box>
+        <Link
+          href="/#try-converter"
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <Box style={navItemStyles}>Converter</Box>
         </Link>
       )}
 

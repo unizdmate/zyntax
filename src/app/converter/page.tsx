@@ -22,10 +22,7 @@ import {
   OutputLanguage,
   ExportStrategy,
 } from "@/types";
-import { 
-  IconAlertCircle,
-  IconCheck,
-} from "@tabler/icons-react";
+import { IconAlertCircle, IconCheck } from "@tabler/icons-react";
 
 export default function ConverterPage() {
   const router = useRouter();
@@ -33,7 +30,9 @@ export default function ConverterPage() {
   const [output, setOutput] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
-  const [conversionTitle, setConversionTitle] = useState<string>("Untitled Conversion");
+  const [conversionTitle, setConversionTitle] = useState<string>(
+    "Untitled Conversion"
+  );
   const [options, setOptions] = useState<ConversionOptionsType>({
     interfaceName: "RootObject",
     useType: false,
@@ -70,7 +69,9 @@ export default function ConverterPage() {
 
       // Show success message
       if (result.id) {
-        setSuccessMessage(`Conversion "${conversionTitle}" saved successfully!`);
+        setSuccessMessage(
+          `Conversion "${conversionTitle}" saved successfully!`
+        );
       }
     } catch (err) {
       setError((err as Error).message || "An error occurred");
@@ -93,7 +94,9 @@ export default function ConverterPage() {
 
   return (
     <Container size="xl" py="xl">
-      <Title order={1} mb="xl">JSON to TypeScript Converter</Title>
+      <Title order={1} mb="xl">
+        JSON to TypeScript Converter
+      </Title>
 
       <Grid>
         <Grid.Col span={{ base: 12, lg: 3 }}>
@@ -107,7 +110,7 @@ export default function ConverterPage() {
             />
           </Paper>
         </Grid.Col>
-        
+
         <Grid.Col span={{ base: 12, lg: 9 }}>
           <Stack gap="md">
             <Grid>
