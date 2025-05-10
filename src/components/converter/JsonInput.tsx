@@ -49,10 +49,10 @@ export function JsonInput({
   const handleEditorChange = (value: string | undefined) => {
     const newContent = value || "";
     setJsonContent(newContent);
-    
+
     // Clear previous error
     setError(null);
-    
+
     // Only validate when there's actual content
     if (newContent.trim().length > 0) {
       try {
@@ -71,7 +71,7 @@ export function JsonInput({
       try {
         // When content is pasted, strip comments immediately
         const strippedContent = stripJsonComments(content);
-        
+
         // Only update the editor content if it actually changed
         if (strippedContent !== content) {
           editor.setValue(strippedContent);
@@ -84,7 +84,7 @@ export function JsonInput({
 
   const validateAndSubmit = () => {
     const result = validateJson(jsonContent);
-    
+
     if (result.isValid) {
       setError(null);
       // If the JSON had comments, use the cleaned version for the conversion
