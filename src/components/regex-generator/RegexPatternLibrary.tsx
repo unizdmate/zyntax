@@ -234,9 +234,9 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
         {
           name: "Strong Password",
           pattern:
-            "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)(?=.*[@$!%*?&])[A-Za-z\\d@$!%*?&]{8,}$",
+            "\\b(?=\\S*[a-z])(?=\\S*[A-Z])(?=\\S*\\d)(?=\\S*[\\W_])[A-Za-z\\d\\W_]{8,16}\\b",
           description:
-            "At least 8 chars with lowercase, uppercase, number, and special char",
+            "Password with 8-16 chars: lowercase, uppercase, number, special char (no spaces)",
           example: "P@ssw0rd",
         },
         {

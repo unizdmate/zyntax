@@ -10,7 +10,6 @@ import {
   Text,
   Box,
   Stack,
-  Divider,
   Alert,
   Button,
   List,
@@ -24,7 +23,6 @@ import {
   Badge,
   SimpleGrid,
   Flex,
-  Tabs,
 } from "@mantine/core";
 import { JsonInput } from "@/components/converter/JsonInput";
 import { TypeScriptOutput } from "@/components/converter/TypeScriptOutput";
@@ -55,10 +53,7 @@ export default function Home() {
   const router = useRouter();
   const { status } = useSession();
   const theme = useMantineTheme();
-  const { colorScheme } = useColorScheme();
-  const [activeTab, setActiveTab] = useState<string>("jsonToTs");
-
-  // JSON to TypeScript state
+  const { colorScheme } = useColorScheme(); // JSON to TypeScript state
   const [jsonToTsOutput, setJsonToTsOutput] = useState<string>("");
   const [jsonToTsError, setJsonToTsError] = useState<string | null>(null);
   const [jsonToTsSuccessMessage, setJsonToTsSuccessMessage] = useState<
@@ -112,16 +107,8 @@ export default function Home() {
       console.error("JSON to TS conversion error:", err);
     }
   };
-
   const handleJsonToTsOptionsChange = (newOptions: ConversionOptionsType) => {
     setJsonToTsOptions(newOptions);
-  };
-
-  // Handler for tab change that ensures we never get null as a value
-  const handleTabChange = (value: string | null) => {
-    if (value) {
-      setActiveTab(value);
-    }
   };
 
   // Features section data
@@ -244,15 +231,12 @@ export default function Home() {
                   }}
                 >
                   Powerful Code Conversion Tools for Developers
-                </Title>
-
+                </Title>{" "}
                 <Text size="lg" mt="md">
-                  Zyntax transforms your code between different formats with
-                  perfect accuracy. Convert JSON to TypeScript or TypeScript to
-                  JSON Schema in seconds. Save time, improve code quality, and
-                  eliminate errors in your projects.
+                  Zyntax transforms your code with perfect accuracy. Convert
+                  JSON to TypeScript in seconds. Save time, improve code
+                  quality, and eliminate errors in your projects.
                 </Text>
-
                 <List
                   spacing="sm"
                   mt="md"
@@ -273,7 +257,6 @@ export default function Home() {
                     <Text fw={500}>Save and share your conversions</Text>
                   </List.Item>
                 </List>
-
                 <Group mt="xl">
                   <Button
                     component="a"
@@ -295,7 +278,7 @@ export default function Home() {
 
             <Grid.Col span={{ base: 12, md: 6 }}>
               <Paper withBorder shadow="md" p="md" radius="md">
-                {/* Preview image or code sample */}
+                {/* Preview image or code sample */}{" "}
                 <Box
                   style={{
                     fontFamily: "monospace",
@@ -312,24 +295,16 @@ export default function Home() {
                     }`,
                   }}
                 >
-                  <Tabs defaultValue="ts" mb="xs">
-                    <Tabs.List>
-                      <Tabs.Tab
-                        value="ts"
-                        leftSection={<IconBrandTypescript size={12} />}
-                      >
+                  <Box mb="xs">
+                    {" "}
+                    <Group gap="xs" mb="xs">
+                      <IconBrandTypescript size={14} />
+                      <Text size="sm" fw={500}>
                         TypeScript
-                      </Tabs.Tab>
-                      <Tabs.Tab
-                        value="schema"
-                        leftSection={<IconBrackets size={12} />}
-                      >
-                        JSON Schema
-                      </Tabs.Tab>
-                    </Tabs.List>
-                    <Tabs.Panel value="ts">
-                      <pre style={{ margin: 0, overflow: "auto" }}>
-                        {`// Generated with Zyntax
+                      </Text>
+                    </Group>
+                    <pre style={{ margin: 0, overflow: "auto" }}>
+                      {`// Generated with Zyntax
 export interface User {
   id: number;
   name: string;
@@ -344,35 +319,14 @@ export interface User {
     };
   };
 }`}
-                      </pre>
-                    </Tabs.Panel>
-                    <Tabs.Panel value="schema">
-                      <pre style={{ margin: 0, overflow: "auto" }}>
-                        {`{
-  "$schema": "http://json-schema.org/draft-07/schema#",
-  "type": "object",
-  "properties": {
-    "id": { "type": "number" },
-    "name": { "type": "string" },
-    "email": { "type": "string" },
-    "isActive": { "type": "boolean" },
-    "roles": {
-      "type": "array",
-      "items": { "type": "string" }
-    }
-  },
-  "required": ["id", "name", "email", "isActive", "roles"]
-}`}
-                      </pre>
-                    </Tabs.Panel>
-                  </Tabs>
+                    </pre>
+                  </Box>
                 </Box>
               </Paper>
             </Grid.Col>
           </Grid>
         </Container>
       </Box>
-
       {/* Features Section */}
       <Container size="xl" py={80}>
         <Box ta="center" mb={50}>
@@ -404,9 +358,8 @@ export interface User {
             </Card>
           ))}
         </SimpleGrid>
-      </Container>
-
-      {/* Converter Section - With Tabs */}
+      </Container>{" "}
+      {/* Converter Section */}
       <Box
         py={60}
         id="try-converter"
@@ -418,94 +371,79 @@ export interface User {
       >
         <Container size="xl">
           <Title order={2} size={36} ta="center" mb="md">
-            Try Our Converters
-          </Title>
+            JSON to TypeScript Converter
+          </Title>{" "}
           <Text size="lg" c="dimmed" ta="center" mb="xl" maw={700} mx="auto">
-            {" "}
             Convert your JSON to TypeScript with our powerful converter
-          </Text>{" "}
-          <Tabs value={activeTab} onChange={handleTabChange} mb="xl">
-            <Tabs.List justify="center">
-              <Tabs.Tab
-                value="jsonToTs"
-                leftSection={<IconJson size={16} />}
-                rightSection={<IconBrandTypescript size={16} />}
-              >
-                JSON to TypeScript
-              </Tabs.Tab>
-            </Tabs.List>
-          </Tabs>
+          </Text>
           {/* JSON to TypeScript Converter */}
-          {activeTab === "jsonToTs" && (
-            <Stack gap="xl">
-              {/* Options Panel */}
-              <Paper p="md" withBorder radius="md">
-                <Title order={4} mb="md">
-                  Customize JSON to TS Options
-                </Title>
-                <ConversionOptions
-                  options={jsonToTsOptions}
-                  onChange={handleJsonToTsOptionsChange}
-                  conversionTitle={jsonToTsTitle}
-                  onTitleChange={setJsonToTsTitle}
-                  isAuthenticated={status === "authenticated"}
+          <Stack gap="xl">
+            {/* Options Panel */}
+            <Paper p="md" withBorder radius="md">
+              <Title order={4} mb="md">
+                Customize JSON to TS Options
+              </Title>
+              <ConversionOptions
+                options={jsonToTsOptions}
+                onChange={handleJsonToTsOptionsChange}
+                conversionTitle={jsonToTsTitle}
+                onTitleChange={setJsonToTsTitle}
+                isAuthenticated={status === "authenticated"}
+              />
+            </Paper>
+
+            {/* Editors */}
+            <Grid>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <JsonInput
+                  onSubmit={handleJsonSubmit}
+                  isLoading={createJsonToTsConversion.isPending}
                 />
-              </Paper>
+              </Grid.Col>
 
-              {/* Editors */}
-              <Grid>
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <JsonInput
-                    onSubmit={handleJsonSubmit}
-                    isLoading={createJsonToTsConversion.isPending}
-                  />
-                </Grid.Col>
+              <Grid.Col span={{ base: 12, md: 6 }}>
+                <TypeScriptOutput
+                  code={jsonToTsOutput}
+                  isLoading={createJsonToTsConversion.isPending}
+                />
+              </Grid.Col>
+            </Grid>
 
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <TypeScriptOutput
-                    code={jsonToTsOutput}
-                    isLoading={createJsonToTsConversion.isPending}
-                  />
-                </Grid.Col>
-              </Grid>
+            {jsonToTsError && (
+              <Alert
+                icon={<IconAlertCircle size="1rem" />}
+                color="red"
+                title="Error"
+                mt="md"
+              >
+                {jsonToTsError}
+              </Alert>
+            )}
 
-              {jsonToTsError && (
-                <Alert
-                  icon={<IconAlertCircle size="1rem" />}
-                  color="red"
-                  title="Error"
-                  mt="md"
-                >
-                  {jsonToTsError}
-                </Alert>
-              )}
-
-              {jsonToTsSuccessMessage && (
-                <Alert
-                  icon={<IconCheck size="1rem" />}
-                  color="green"
-                  title="Success"
-                  mt="md"
-                >
-                  <Group align="center" gap="xs">
-                    <Text>{jsonToTsSuccessMessage}</Text>
-                    {status === "authenticated" && (
-                      <Button
-                        variant="light"
-                        size="xs"
-                        onClick={() => router.push("/dashboard")}
-                      >
-                        View in Dashboard
-                      </Button>
-                    )}
-                  </Group>
-                </Alert>
-              )}
-            </Stack>
-          )}
+            {jsonToTsSuccessMessage && (
+              <Alert
+                icon={<IconCheck size="1rem" />}
+                color="green"
+                title="Success"
+                mt="md"
+              >
+                <Group align="center" gap="xs">
+                  <Text>{jsonToTsSuccessMessage}</Text>
+                  {status === "authenticated" && (
+                    <Button
+                      variant="light"
+                      size="xs"
+                      onClick={() => router.push("/dashboard")}
+                    >
+                      View in Dashboard
+                    </Button>
+                  )}
+                </Group>
+              </Alert>
+            )}
+          </Stack>
         </Container>
       </Box>
-
       {/* Pricing Section */}
       <Container size="xl" py={80}>
         <Box ta="center" mb={50}>
@@ -605,7 +543,6 @@ export interface User {
           ))}
         </SimpleGrid>
       </Container>
-
       {/* CTA Section */}
       <Box
         py={60}
