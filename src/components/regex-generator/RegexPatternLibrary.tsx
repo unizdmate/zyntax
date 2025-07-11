@@ -26,9 +26,9 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
   const [copiedPattern, setCopiedPattern] = useState<string | null>(null);
   const { colorScheme } = useColorScheme();
   const theme = useMantineTheme();
-  
+
   // Determine if we're in dark mode
-  const isDarkMode = 
+  const isDarkMode =
     colorScheme === "dark" ||
     (colorScheme === "auto" &&
       typeof window !== "undefined" &&
@@ -335,21 +335,39 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
     },
   ];
   return (
-    <Stack>      <Accordion
+    <Stack>
+      {" "}
+      <Accordion
         styles={{
           item: {
-            backgroundColor: isDarkMode ? theme.colors.dark[6] : theme.colors.gray[0],
+            backgroundColor: isDarkMode
+              ? theme.colors.dark[6]
+              : theme.colors.gray[0],
             border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
             borderRadius: theme.radius.sm,
             marginBottom: "8px",
           },
           control: {
-            backgroundColor: isDarkMode ? theme.colors.dark[6] : theme.colors.gray[0],
+            backgroundColor: isDarkMode
+              ? theme.colors.dark[6]
+              : theme.colors.gray[0],
             color: theme.colors.blue[5],
-            "&:hover": { backgroundColor: isDarkMode ? theme.colors.dark[5] : theme.colors.gray[1] },
+            "&:hover": {
+              backgroundColor: isDarkMode
+                ? theme.colors.dark[5]
+                : theme.colors.gray[1],
+            },
           },
-          content: { backgroundColor: isDarkMode ? theme.colors.dark[6] : theme.colors.gray[0], color: isDarkMode ? theme.white : theme.black },
-          label: { color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7], fontWeight: 500 },
+          content: {
+            backgroundColor: isDarkMode
+              ? theme.colors.dark[6]
+              : theme.colors.gray[0],
+            color: isDarkMode ? theme.white : theme.black,
+          },
+          label: {
+            color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7],
+            fontWeight: 500,
+          },
           chevron: { color: theme.colors.blue[5] },
         }}
       >
@@ -358,17 +376,22 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
             <Accordion.Control>{category.category}</Accordion.Control>
             <Accordion.Panel>
               <Stack gap="xs">
-                {category.patterns.map((pattern) => (                    <Stack
+                {category.patterns.map((pattern) => (
+                  <Stack
                     key={pattern.name}
                     gap="xs"
                     p="xs"
                     style={{
-                      backgroundColor: isDarkMode ? theme.colors.dark[5] : theme.colors.gray[1],
+                      backgroundColor: isDarkMode
+                        ? theme.colors.dark[5]
+                        : theme.colors.gray[1],
                       borderRadius: theme.radius.sm,
                       border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}`,
                     }}
                   >
-                    <Group justify="space-between" wrap="nowrap">                      <Text fw={500} c={isDarkMode ? "gray.2" : "gray.7"}>
+                    <Group justify="space-between" wrap="nowrap">
+                      {" "}
+                      <Text fw={500} c={isDarkMode ? "gray.2" : "gray.7"}>
                         {pattern.name}
                       </Text>
                       <Group gap="xs">
@@ -396,25 +419,36 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
                           </ActionIcon>
                         </Tooltip>
                       </Group>
-                    </Group>{" "}                    <Text size="sm" c={isDarkMode ? "gray.4" : "gray.6"}>
+                    </Group>{" "}
+                    <Text size="sm" c={isDarkMode ? "gray.4" : "gray.6"}>
                       {pattern.description}
                     </Text>
                     {pattern.example && (
-                      <Group>                        <Text size="sm" fw={500} c={isDarkMode ? "gray.3" : "gray.6"}>
+                      <Group>
+                        {" "}
+                        <Text
+                          size="sm"
+                          fw={500}
+                          c={isDarkMode ? "gray.3" : "gray.6"}
+                        >
                           Example:
                         </Text>
                         <Text
-                          size="sm"                          c={isDarkMode ? "cyan.4" : "blue.6"}
+                          size="sm"
+                          c={isDarkMode ? "cyan.4" : "blue.6"}
                           style={{ fontStyle: "italic" }}
                         >
                           {pattern.example}
                         </Text>
                       </Group>
-                    )}                    <Code
+                    )}{" "}
+                    <Code
                       block
                       style={{
                         fontSize: rem(12),
-                        backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0],
+                        backgroundColor: isDarkMode
+                          ? theme.colors.dark[9]
+                          : theme.colors.blue[0],
                         color: theme.colors.blue[5],
                         border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[4]}`,
                       }}

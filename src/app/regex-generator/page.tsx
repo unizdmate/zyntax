@@ -31,14 +31,19 @@ export default function RegexGeneratorPage() {
   const [flags, setFlags] = useState<string>("g");
   const { colorScheme } = useColorScheme();
   const theme = useMantineTheme();
-  
+
   // Determine if we're in dark mode
-  const isDarkMode = 
+  const isDarkMode =
     colorScheme === "dark" ||
     (colorScheme === "auto" &&
       typeof window !== "undefined" &&
-      window.matchMedia("(prefers-color-scheme: dark)").matches);  return (
-    <Container size="xl" py="xl" style={{ color: isDarkMode ? theme.white : theme.black }}>
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  return (
+    <Container
+      size="xl"
+      py="xl"
+      style={{ color: isDarkMode ? theme.white : theme.black }}
+    >
       <Title order={1} mb="lg">
         <Text
           inherit
@@ -57,13 +62,16 @@ export default function RegexGeneratorPage() {
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
             {" "}
-            {/* Getting Started Guide - Always visible and more prominent */}            <Paper
+            {/* Getting Started Guide - Always visible and more prominent */}{" "}
+            <Paper
               p="md"
               radius="md"
               withBorder
-              style={{ 
-                backgroundColor: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0],
-                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`
+              style={{
+                backgroundColor: isDarkMode
+                  ? theme.colors.dark[7]
+                  : theme.colors.gray[0],
+                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
               }}
             >
               <Group align="center" mb="xs">
@@ -83,7 +91,8 @@ export default function RegexGeneratorPage() {
               flags={flags}
               setFlags={setFlags}
             />{" "}
-            {/* Your Regular Expression section moved below the builder */}            <Paper
+            {/* Your Regular Expression section moved below the builder */}{" "}
+            <Paper
               shadow="sm"
               p="md"
               radius="md"
@@ -103,7 +112,9 @@ export default function RegexGeneratorPage() {
                   style={{
                     flex: 1,
                     fontSize: rem(16),
-                    backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0],
+                    backgroundColor: isDarkMode
+                      ? theme.colors.dark[9]
+                      : theme.colors.gray[0],
                     color: theme.colors.blue[5],
                     border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}`,
                   }}
@@ -140,7 +151,8 @@ export default function RegexGeneratorPage() {
             shadow="sm"
             p="md"
             radius="md"
-            withBorder            style={{
+            withBorder
+            style={{
               height: "75vh",
               display: "flex",
               flexDirection: "column",
@@ -159,8 +171,17 @@ export default function RegexGeneratorPage() {
               offsetScrollbars
               scrollbarSize={8}
               styles={{
-                scrollbar: { backgroundColor: isDarkMode ? theme.colors.dark[5] : theme.colors.gray[1] },
-                thumb: { backgroundColor: isDarkMode ? theme.colors.dark[4] : theme.colors.gray[4], borderRadius: "4px" },
+                scrollbar: {
+                  backgroundColor: isDarkMode
+                    ? theme.colors.dark[5]
+                    : theme.colors.gray[1],
+                },
+                thumb: {
+                  backgroundColor: isDarkMode
+                    ? theme.colors.dark[4]
+                    : theme.colors.gray[4],
+                  borderRadius: "4px",
+                },
               }}
             >
               <RegexPatternLibrary setRegex={setRegex} />

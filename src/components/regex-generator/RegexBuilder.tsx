@@ -56,9 +56,9 @@ export function RegexBuilder({
   const [currentBlock, setCurrentBlock] = useState<string>("");
   const { colorScheme } = useColorScheme();
   const theme = useMantineTheme();
-  
+
   // Determine if we're in dark mode
-  const isDarkMode = 
+  const isDarkMode =
     colorScheme === "dark" ||
     (colorScheme === "auto" &&
       typeof window !== "undefined" &&
@@ -113,9 +113,11 @@ export function RegexBuilder({
         withBorder
         mb="md"
         radius="md"
-        style={{ 
-          backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0], 
-          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}` 
+        style={{
+          backgroundColor: isDarkMode
+            ? theme.colors.dark[9]
+            : theme.colors.blue[0],
+          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
         }}
       >
         <Title order={5} mb="xs" style={{ color: theme.colors.blue[5] }}>
@@ -132,8 +134,8 @@ export function RegexBuilder({
         </Text>
         <Text size="sm" mt={10} c={isDarkMode ? "gray.5" : "gray.6"}>
           The flags you choose dramatically affect how your regex matches text.
-          Click the info icon next to &quot;Regex Flags&quot; to learn more about each
-          flag&apos;s purpose and behavior.
+          Click the info icon next to &quot;Regex Flags&quot; to learn more
+          about each flag&apos;s purpose and behavior.
         </Text>
       </Paper>
 
@@ -142,9 +144,9 @@ export function RegexBuilder({
         p="xs"
         withBorder
         mb="md"
-        style={{ 
-          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0], 
-          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}` 
+        style={{
+          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0],
+          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
         }}
       >
         <Group mb="md" justify="space-between" align="center">
@@ -199,7 +201,11 @@ export function RegexBuilder({
                     </Group>
                   </Accordion.Control>
                   <Accordion.Panel>
-                    <Text size="sm" mb={10} c={isDarkMode ? "gray.4" : "gray.6"}>
+                    <Text
+                      size="sm"
+                      mb={10}
+                      c={isDarkMode ? "gray.4" : "gray.6"}
+                    >
                       Find all matches rather than stopping at the first match.
                     </Text>
                     <Text size="sm" mb={5} c={isDarkMode ? "gray.3" : "gray.7"}>
@@ -207,13 +213,27 @@ export function RegexBuilder({
                     </Text>
                     <Text size="sm" mb={8} c={isDarkMode ? "gray.3" : "gray.7"}>
                       Text:{" "}
-                      <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>
+                      <Code
+                        style={{
+                          backgroundColor: isDarkMode
+                            ? theme.colors.dark[9]
+                            : theme.colors.gray[0],
+                        }}
+                      >
                         "Apple APPLE apple"
                       </Code>
                     </Text>
                     <Text size="sm" mb={8} c={isDarkMode ? "gray.3" : "gray.7"}>
                       Pattern:{" "}
-                      <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>/apple/</Code>
+                      <Code
+                        style={{
+                          backgroundColor: isDarkMode
+                            ? theme.colors.dark[9]
+                            : theme.colors.gray[0],
+                        }}
+                      >
+                        /apple/
+                      </Code>
                     </Text>
                     <Group align="center">
                       <Badge color="gray" size="sm" variant="filled">
@@ -222,7 +242,12 @@ export function RegexBuilder({
                       <Text
                         size="sm"
                         span
-                        style={{ fontFamily: "monospace", color: isDarkMode ? theme.colors.gray[2] : theme.colors.gray[7] }}
+                        style={{
+                          fontFamily: "monospace",
+                          color: isDarkMode
+                            ? theme.colors.gray[2]
+                            : theme.colors.gray[7],
+                        }}
                       >
                         <span
                           style={{
@@ -241,7 +266,12 @@ export function RegexBuilder({
                       <Text
                         size="sm"
                         span
-                        style={{ fontFamily: "monospace", color: isDarkMode ? theme.colors.gray[2] : theme.colors.gray[7] }}
+                        style={{
+                          fontFamily: "monospace",
+                          color: isDarkMode
+                            ? theme.colors.gray[2]
+                            : theme.colors.gray[7],
+                        }}
                       >
                         <span
                           style={{
@@ -266,7 +296,11 @@ export function RegexBuilder({
                     </Group>
                   </Accordion.Control>
                   <Accordion.Panel>
-                    <Text size="sm" mb={10} c={isDarkMode ? "gray.4" : "gray.6"}>
+                    <Text
+                      size="sm"
+                      mb={10}
+                      c={isDarkMode ? "gray.4" : "gray.6"}
+                    >
                       Match regardless of letter case (upper/lowercase).
                     </Text>
                     <Text size="sm" mb={5} c={isDarkMode ? "gray.3" : "gray.7"}>
@@ -274,13 +308,27 @@ export function RegexBuilder({
                     </Text>
                     <Text size="sm" mb={8} c={isDarkMode ? "gray.3" : "gray.7"}>
                       Text:{" "}
-                      <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>
+                      <Code
+                        style={{
+                          backgroundColor: isDarkMode
+                            ? theme.colors.dark[9]
+                            : theme.colors.gray[0],
+                        }}
+                      >
                         "Apple APPLE apple"
                       </Code>
                     </Text>
                     <Text size="sm" mb={8} c={isDarkMode ? "gray.3" : "gray.7"}>
                       Pattern:{" "}
-                      <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>/apple/</Code>
+                      <Code
+                        style={{
+                          backgroundColor: isDarkMode
+                            ? theme.colors.dark[9]
+                            : theme.colors.gray[0],
+                        }}
+                      >
+                        /apple/
+                      </Code>
                     </Text>
                     <Group align="center">
                       <Badge color="gray" size="sm" variant="filled">
@@ -289,7 +337,12 @@ export function RegexBuilder({
                       <Text
                         size="sm"
                         span
-                        style={{ fontFamily: "monospace", color: isDarkMode ? theme.colors.gray[2] : theme.colors.gray[7] }}
+                        style={{
+                          fontFamily: "monospace",
+                          color: isDarkMode
+                            ? theme.colors.gray[2]
+                            : theme.colors.gray[7],
+                        }}
                       >
                         Apple APPLE{" "}
                         <span
@@ -309,7 +362,12 @@ export function RegexBuilder({
                       <Text
                         size="sm"
                         span
-                        style={{ fontFamily: "monospace", color: isDarkMode ? theme.colors.gray[2] : theme.colors.gray[7] }}
+                        style={{
+                          fontFamily: "monospace",
+                          color: isDarkMode
+                            ? theme.colors.gray[2]
+                            : theme.colors.gray[7],
+                        }}
                       >
                         <span
                           style={{
@@ -350,23 +408,39 @@ export function RegexBuilder({
                     </Group>
                   </Accordion.Control>
                   <Accordion.Panel>
-                    <Text size="sm" mb={10} c={isDarkMode ? "gray.4" : "gray.6"}>
+                    <Text
+                      size="sm"
+                      mb={10}
+                      c={isDarkMode ? "gray.4" : "gray.6"}
+                    >
                       ^ and $ match start/end of each line, not just the whole
                       string.
                     </Text>
                     <Code
                       block
                       mb={8}
-                      style={{ 
-                        backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0], 
-                        color: isDarkMode ? theme.colors.gray[2] : theme.colors.gray[7] 
+                      style={{
+                        backgroundColor: isDarkMode
+                          ? theme.colors.dark[9]
+                          : theme.colors.gray[0],
+                        color: isDarkMode
+                          ? theme.colors.gray[2]
+                          : theme.colors.gray[7],
                       }}
                     >
                       Line1 Line2 Line3
                     </Code>
                     <Text size="sm" mb={8} c={isDarkMode ? "gray.3" : "gray.7"}>
                       Pattern:{" "}
-                      <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>/^Line/</Code>
+                      <Code
+                        style={{
+                          backgroundColor: isDarkMode
+                            ? theme.colors.dark[9]
+                            : theme.colors.gray[0],
+                        }}
+                      >
+                        /^Line/
+                      </Code>
                     </Text>
                     <Group align="center">
                       <Badge color="gray" size="sm" variant="filled">
@@ -397,24 +471,64 @@ export function RegexBuilder({
                     </Group>
                   </Accordion.Control>
                   <Accordion.Panel>
-                    <Text size="sm" mb={10} c={isDarkMode ? "gray.4" : "gray.6"}>
-                      Makes the dot (.) match newlines as well. Normally, the dot
-                      matches any character except newlines.
+                    <Text
+                      size="sm"
+                      mb={10}
+                      c={isDarkMode ? "gray.4" : "gray.6"}
+                    >
+                      Makes the dot (.) match newlines as well. Normally, the
+                      dot matches any character except newlines.
                     </Text>
-                    <Paper p="md" withBorder radius="sm" bg={isDarkMode ? theme.colors.dark[8] : theme.colors.gray[0]}>
-                      <Text fw={500} size="sm" mb={8} c={isDarkMode ? theme.colors.blue[5] : theme.colors.blue[7]}>
+                    <Paper
+                      p="md"
+                      withBorder
+                      radius="sm"
+                      bg={
+                        isDarkMode ? theme.colors.dark[8] : theme.colors.gray[0]
+                      }
+                    >
+                      <Text
+                        fw={500}
+                        size="sm"
+                        mb={8}
+                        c={
+                          isDarkMode
+                            ? theme.colors.blue[5]
+                            : theme.colors.blue[7]
+                        }
+                      >
                         Example:
                       </Text>
-                      <Text size="sm" mb={8} c={isDarkMode ? "gray.3" : "gray.7"}>
+                      <Text
+                        size="sm"
+                        mb={8}
+                        c={isDarkMode ? "gray.3" : "gray.7"}
+                      >
                         Text:{" "}
-                        <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>
+                        <Code
+                          style={{
+                            backgroundColor: isDarkMode
+                              ? theme.colors.dark[9]
+                              : theme.colors.gray[0],
+                          }}
+                        >
                           "Line1\nLine2"
                         </Code>{" "}
                         (contains newline)
                       </Text>
-                      <Text size="sm" mb={8} c={isDarkMode ? "gray.3" : "gray.7"}>
+                      <Text
+                        size="sm"
+                        mb={8}
+                        c={isDarkMode ? "gray.3" : "gray.7"}
+                      >
                         Pattern:{" "}
-                        <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>
+                        <Code
+                          style={{
+                            backgroundColor: isDarkMode
+                              ? theme.colors.dark[9]
+                              : theme.colors.gray[0],
+                          }}
+                        >
                           /Line1.Line2/
                         </Code>
                       </Text>
@@ -445,14 +559,26 @@ export function RegexBuilder({
                 mt="lg"
                 radius="md"
                 bg={isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0]}
-                style={{ border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}` }}
+                style={{
+                  border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+                }}
               >
-                <Title order={6} mb="xs" style={{ color: theme.colors.blue[5] }}>
+                <Title
+                  order={6}
+                  mb="xs"
+                  style={{ color: theme.colors.blue[5] }}
+                >
                   Combining Flags
                 </Title>
                 <Text size="xs" c={isDarkMode ? "gray.4" : "gray.6"}>
                   Flags can be combined for powerful matching. For example,{" "}
-                  <Code style={{ backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0] }}>
+                  <Code
+                    style={{
+                      backgroundColor: isDarkMode
+                        ? theme.colors.dark[9]
+                        : theme.colors.gray[0],
+                    }}
+                  >
                     /pattern/gim
                   </Code>{" "}
                   will match globally, case-insensitive, and across multiple
@@ -467,9 +593,11 @@ export function RegexBuilder({
             <Paper
               p="xs"
               radius="md"
-              style={{ 
-                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`, 
-                backgroundColor: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0] 
+              style={{
+                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+                backgroundColor: isDarkMode
+                  ? theme.colors.dark[7]
+                  : theme.colors.gray[0],
               }}
             >
               <Group justify="space-between">
@@ -477,7 +605,11 @@ export function RegexBuilder({
                   size="md"
                   label={
                     <Group gap={5}>
-                      <Text component="span" fw={500} c={isDarkMode ? "gray.3" : "gray.7"}>
+                      <Text
+                        component="span"
+                        fw={500}
+                        c={isDarkMode ? "gray.3" : "gray.7"}
+                      >
                         Global
                       </Text>
                       <Badge size="sm" variant="filled" color="blue">
@@ -490,7 +622,11 @@ export function RegexBuilder({
                   onChange={() => toggleFlag("g")}
                   color="blue"
                   styles={{
-                    description: { color: isDarkMode ? theme.colors.gray[5] : theme.colors.gray[6] },
+                    description: {
+                      color: isDarkMode
+                        ? theme.colors.gray[5]
+                        : theme.colors.gray[6],
+                    },
                   }}
                 />
               </Group>
@@ -500,9 +636,11 @@ export function RegexBuilder({
             <Paper
               p="xs"
               radius="md"
-              style={{ 
-                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`, 
-                backgroundColor: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0] 
+              style={{
+                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+                backgroundColor: isDarkMode
+                  ? theme.colors.dark[7]
+                  : theme.colors.gray[0],
               }}
             >
               <Group justify="space-between">
@@ -510,7 +648,11 @@ export function RegexBuilder({
                   size="md"
                   label={
                     <Group gap={5}>
-                      <Text component="span" fw={500} c={isDarkMode ? "gray.3" : "gray.7"}>
+                      <Text
+                        component="span"
+                        fw={500}
+                        c={isDarkMode ? "gray.3" : "gray.7"}
+                      >
                         Case Insensitive
                       </Text>
                       <Badge size="sm" variant="filled" color="blue">
@@ -523,7 +665,11 @@ export function RegexBuilder({
                   onChange={() => toggleFlag("i")}
                   color="blue"
                   styles={{
-                    description: { color: isDarkMode ? theme.colors.gray[5] : theme.colors.gray[6] },
+                    description: {
+                      color: isDarkMode
+                        ? theme.colors.gray[5]
+                        : theme.colors.gray[6],
+                    },
                   }}
                 />
               </Group>
@@ -533,9 +679,11 @@ export function RegexBuilder({
             <Paper
               p="xs"
               radius="md"
-              style={{ 
-                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`, 
-                backgroundColor: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0] 
+              style={{
+                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+                backgroundColor: isDarkMode
+                  ? theme.colors.dark[7]
+                  : theme.colors.gray[0],
               }}
             >
               <Group justify="space-between">
@@ -543,7 +691,11 @@ export function RegexBuilder({
                   size="md"
                   label={
                     <Group gap={5}>
-                      <Text component="span" fw={500} c={isDarkMode ? "gray.3" : "gray.7"}>
+                      <Text
+                        component="span"
+                        fw={500}
+                        c={isDarkMode ? "gray.3" : "gray.7"}
+                      >
                         Multiline
                       </Text>
                       <Badge size="sm" variant="filled" color="blue">
@@ -556,7 +708,11 @@ export function RegexBuilder({
                   onChange={() => toggleFlag("m")}
                   color="blue"
                   styles={{
-                    description: { color: isDarkMode ? theme.colors.gray[5] : theme.colors.gray[6] },
+                    description: {
+                      color: isDarkMode
+                        ? theme.colors.gray[5]
+                        : theme.colors.gray[6],
+                    },
                   }}
                 />
               </Group>
@@ -566,9 +722,11 @@ export function RegexBuilder({
             <Paper
               p="xs"
               radius="md"
-              style={{ 
-                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`, 
-                backgroundColor: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0] 
+              style={{
+                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
+                backgroundColor: isDarkMode
+                  ? theme.colors.dark[7]
+                  : theme.colors.gray[0],
               }}
             >
               <Group justify="space-between">
@@ -576,7 +734,11 @@ export function RegexBuilder({
                   size="md"
                   label={
                     <Group gap={5}>
-                      <Text component="span" fw={500} c={isDarkMode ? "gray.3" : "gray.7"}>
+                      <Text
+                        component="span"
+                        fw={500}
+                        c={isDarkMode ? "gray.3" : "gray.7"}
+                      >
                         Dot All
                       </Text>
                       <Badge size="sm" variant="filled" color="blue">
@@ -589,7 +751,11 @@ export function RegexBuilder({
                   onChange={() => toggleFlag("s")}
                   color="blue"
                   styles={{
-                    description: { color: isDarkMode ? theme.colors.gray[5] : theme.colors.gray[6] },
+                    description: {
+                      color: isDarkMode
+                        ? theme.colors.gray[5]
+                        : theme.colors.gray[6],
+                    },
                   }}
                 />
               </Group>
@@ -602,9 +768,9 @@ export function RegexBuilder({
         p="xs"
         withBorder
         mb="md"
-        style={{ 
-          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0], 
-          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}` 
+        style={{
+          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0],
+          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
         }}
       >
         <Title order={5} mb="xs" style={{ color: theme.colors.blue[5] }}>
@@ -616,7 +782,9 @@ export function RegexBuilder({
               size="sm"
               variant="light"
               leftSection={<IconRegex size="1rem" />}
-              onClick={() => addPattern("[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")}
+              onClick={() =>
+                addPattern("[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}")
+              }
             >
               Email
             </Button>
@@ -673,11 +841,7 @@ export function RegexBuilder({
             </Button>
           </Tooltip>
           <Tooltip label="Any non-digit">
-            <Button
-              size="sm"
-              variant="light"
-              onClick={() => addPattern("\\D")}
-            >
+            <Button size="sm" variant="light" onClick={() => addPattern("\\D")}>
               Non-Digit
             </Button>
           </Tooltip>
@@ -718,9 +882,9 @@ export function RegexBuilder({
         p="xs"
         withBorder
         mb="md"
-        style={{ 
-          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0], 
-          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}` 
+        style={{
+          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0],
+          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
         }}
       >
         <Title order={5} mb="xs" style={{ color: theme.colors.blue[5] }}>
@@ -794,9 +958,9 @@ export function RegexBuilder({
         p="md"
         withBorder
         mb="md"
-        style={{ 
-          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0], 
-          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}` 
+        style={{
+          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0],
+          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
         }}
       >
         <Title order={5} mb="xs" style={{ color: theme.colors.blue[5] }}>
@@ -835,9 +999,9 @@ export function RegexBuilder({
         p="xs"
         withBorder
         mb="md"
-        style={{ 
-          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0], 
-          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}` 
+        style={{
+          background: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0],
+          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
         }}
       >
         <Title order={5} mb="xs" style={{ color: theme.colors.blue[5] }}>
@@ -852,7 +1016,7 @@ export function RegexBuilder({
               onClick={() => addPattern("[...]")}
               color="blue"
             >
-              [...] 
+              [...]
             </Button>
           </Tooltip>
           <Tooltip label="Capture Group - Group and capture">
@@ -862,7 +1026,7 @@ export function RegexBuilder({
               onClick={() => addPattern("(...)")}
               color="blue"
             >
-              (...) 
+              (...)
             </Button>
           </Tooltip>
           <Tooltip label="Non-Capturing Group - Group without capturing">
