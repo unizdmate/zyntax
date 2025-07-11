@@ -100,7 +100,6 @@ export function Header() {
           Home
         </Box>
       </Link>
-
       {status === "authenticated" ? (
         <Link
           href="/converter"
@@ -119,8 +118,7 @@ export function Header() {
         >
           <Box style={navItemStyles}>Converter</Box>
         </Link>
-      )}
-
+      )}{" "}
       <Link
         href="/features"
         style={{ textDecoration: "none", color: "inherit" }}
@@ -131,7 +129,18 @@ export function Header() {
           Features
         </Box>
       </Link>
-
+      <Link
+        href="/regex-generator"
+        style={{ textDecoration: "none", color: "inherit" }}
+      >
+        <Box
+          style={
+            isActive("/regex-generator") ? activeNavItemStyles : navItemStyles
+          }
+        >
+          Regex Generator
+        </Box>
+      </Link>
       {status === "authenticated" && (
         <Link
           href="/dashboard"

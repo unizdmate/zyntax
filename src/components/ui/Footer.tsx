@@ -35,7 +35,6 @@ export function Footer() {
     (colorScheme === "auto" &&
       typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches);
-
   // Footer sections
   const sections = [
     {
@@ -43,6 +42,7 @@ export function Footer() {
       links: [
         { label: "Features", href: "/features" },
         { label: "Converter", href: "/" },
+        { label: "Regex Generator", href: "/regex-generator" },
         { label: "API Documentation", href: "/docs/api" },
         { label: "Pricing", href: "/pricing" },
       ],

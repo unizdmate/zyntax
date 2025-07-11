@@ -32,6 +32,8 @@
     "prisma": "^6.7.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
+    "regex-colorizer": "^1.0.2",
+    "regexp-tree": "^0.1.27",
     "resend": "^4.5.1",
     "typescript-json-schema": "^0.65.1",
     "usehooks-ts": "^3.1.1",

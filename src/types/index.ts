@@ -15,6 +15,7 @@ export enum ConversionType {
   JSON_TO_PYTHON = "JSON_TO_PYTHON",
   JSON_TO_JAVA = "JSON_TO_JAVA",
   TS_TO_SCHEMA = "TS_TO_SCHEMA", // New conversion type
+  REGEX_GENERATOR = "REGEX_GENERATOR", // Regex generator type
 }
 
 export enum OutputLanguage {
@@ -84,6 +85,25 @@ export interface ConversionResponse {
   id: string;
   outputCode: string;
   language: OutputLanguage;
+}
+
+// Regex Generator types
+export interface RegexPattern {
+  name: string;
+  pattern: string;
+  description: string;
+  example?: string;
+}
+
+export interface RegexPatternCategory {
+  category: string;
+  patterns: RegexPattern[];
+}
+
+export interface RegexMatch {
+  value: string;
+  index: number;
+  groups?: { [key: string]: string };
 }
 
 // NextAuth types
