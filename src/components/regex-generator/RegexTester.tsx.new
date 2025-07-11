@@ -1,0 +1,348 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  Paper,
+  Title,
+  Textarea,
+  Text,
+  Group,
+  Badge,
+  Code,
+  Divider,
+  Alert,
+  ScrollArea,
+  rem,
+  Stack,
+} from "@mantine/core";
+import { IconAlertCircle, IconInfoCircle } from "@tabler/icons-react";
+import { RegexMatch } from "@/types";
+import {
+  getAllMatches,
+  isValidRegex,
+} from "@/lib/regex-generator/regexService";
+
+interface RegexTesterProps {
+  regex: string;
+  flags: string;
+}
+
+export function RegexTester({ regex, flags }: RegexTesterProps) {
+  const [testString, setTestString] = useState<string>(
+    "Hello, test@example.com is an email address! Visit https://example.com for more info.\n" +
+    "Call us at 555-123-4567 or on Jan-15-2025."
+  );
+  const [matches, setMatches] = useState<RegexMatch[]>([]);
+  const [error, setError] = useState<string | null>(null);
+  
+  // Test the regex against the input string
+  useEffect(() => {
+    if (!regex) {
+      setMatches([]);
+      setError(null);
+      return;
+    }
+
+    if (!isValidRegex(regex)) {
+      setError("Invalid regular expression");
+      setMatches([]);
+      return;
+    }
+
+    try {
+      const result = getAllMatches(regex, flags, testString);
+
+      if (result.success) {
+        setMatches(result.matches);
+        setError(null);
+      } else {
+        setError(result.error || "Unknown error occurred");
+        setMatches([]);
+      }
+    } catch (err) {
+      setError((err as Error).message);
+      setMatches([]);
+    }
+  }, [regex, flags, testString]);
+
+  // Highlight matches in the test string
+  const renderHighlightedString = () => {
+    if (!regex || matches.length === 0) return testString;
+
+    let result = [];
+    let lastIndex = 0;
+
+    // Sort matches by index to ensure correct order
+    const sortedMatches = [...matches].sort((a, b) => a.index - b.index);
+
+    for (const match of sortedMatches) {
+      // Add text before match
+      if (match.index > lastIndex) {
+        result.push(
+          <span key={`text-${lastIndex}`}>
+            {testString.substring(lastIndex, match.index)}
+          </span>
+        );
+      }
+
+      // Add highlighted match
+      result.push(
+        <span
+          key={`match-${match.index}`}
+          style={{
+            backgroundColor: "#4dadff50",
+            padding: "0 2px",
+            borderRadius: "2px",
+            fontWeight: 600,
+          }}
+        >
+          {testString.substring(match.index, match.index + match.value.length)}
+        </span>
+      );
+
+      lastIndex = match.index + match.value.length;
+    }
+
+    // Add remaining text
+    if (lastIndex < testString.length) {
+      result.push(
+        <span key={`text-${lastIndex}`}>{testString.substring(lastIndex)}</span>
+      );
+    }
+
+    return result;
+  };
+  
+  return (
+    <Paper shadow="sm" p="xl" radius="md" withBorder>
+      {/* Header with title and match counter */}
+      <Group justify="space-between" mb="xl">
+        <Title order={3}>Regex Tester</Title>
+        <Badge
+          color={matches.length > 0 ? "green" : "blue"}
+          variant="light"
+          size="lg"
+        >
+          {matches.length > 0
+            ? `${matches.length} match${matches.length !== 1 ? "es" : ""}`
+            : "No matches yet"}
+        </Badge>
+      </Group>
+
+      {/* Information alert */}
+      <Alert
+        icon={<IconInfoCircle size={rem(18)} />}
+        color="blue"
+        variant="light"
+        mb="xl"
+        p="md"
+        radius="md"
+      >
+        Enter sample text below to test your regular expression and see
+        highlighted matches
+      </Alert>
+      
+      {/* Test string input section */}
+      <Stack spacing="lg" mb="xl">
+        <Textarea
+          label="Test String"
+          description="Enter text that you expect your regex to match against"
+          placeholder="Enter text to test against your regex"
+          minRows={3}
+          maxRows={5}
+          value={testString}
+          onChange={(e) => setTestString(e.currentTarget.value)}
+          styles={{
+            root: { marginBottom: rem(8) }
+          }}
+          size="md"
+        />
+        
+        <Group gap="xs">
+          <Text size="sm" fw={500} c="dimmed">Examples:</Text>
+          {[
+            { label: "Email", text: "Contact us at support@example.com or sales@company.co.uk today!" },
+            { label: "Phone", text: "Call 555-123-4567 or (800) 555-1212 for more information." },
+            { label: "Dates", text: "Meeting on 2025-07-15 or 12/25/2025 and 01.15.2025" },
+            { label: "URLs", text: "Visit https://example.com or http://www.test.org/page.html?q=123" },
+          ].map((example, i) => (
+            <Badge 
+              key={i}
+              variant="outline" 
+              style={{ cursor: "pointer" }}
+              onClick={() => setTestString(example.text)}
+              size="md"
+            >
+              {example.label}
+            </Badge>
+          ))}
+        </Group>
+      </Stack>
+
+      {/* Error message */}
+      {error && (
+        <Alert
+          icon={<IconAlertCircle size={rem(18)} />}
+          title="Regex Error"
+          color="red"
+          mb="xl"
+          p="md"
+          radius="md"
+        >
+          {error}
+        </Alert>
+      )}
+
+      {/* Results section */}
+      {regex && !error && (
+        <Paper p="lg" withBorder mb="md" mt="xl" radius="md">
+          <Title order={4} mb="lg">
+            Results
+          </Title>
+          
+          {/* Text with highlighted matches */}
+          <Paper 
+            p="lg" 
+            withBorder 
+            radius="md" 
+            bg="rgba(240, 245, 250, 0.7)" 
+            mb="xl"
+            style={{ lineHeight: 1.7 }}
+          >
+            <Text size="md">{renderHighlightedString()}</Text>
+          </Paper>
+          
+          <Divider my="xl" label={<Text fw={500}>Match Details</Text>} labelPosition="center" />
+          
+          {/* Match details */}
+          {matches.length > 0 ? (
+            <Stack spacing="lg">
+              <ScrollArea h={matches.length > 3 ? 300 : "auto"} type="auto" offsetScrollbars>
+                {matches.map((match, index) => (
+                  <Paper
+                    key={index}
+                    p="md"
+                    withBorder
+                    mb="lg"
+                    radius="md"
+                    style={{
+                      borderLeft: "4px solid #4dadff",
+                      backgroundColor: "rgba(240, 245, 250, 0.5)",
+                    }}
+                  >
+                    <Group position="apart" mb="md">
+                      <Text fw={600} size="md">
+                        Match #{index + 1}
+                      </Text>
+                      <Badge size="md" variant="light" color="blue">Position: {match.index}</Badge>
+                    </Group>
+
+                    <Paper p="md" withBorder bg="white" radius="md" mb="md">
+                      <Text fw={500} c="dimmed" mb="sm">
+                        Matched Value:
+                      </Text>
+                      <Code block p="md" style={{ fontSize: rem(15) }}>{match.value}</Code>
+                    </Paper>
+
+                    <Paper p="md" withBorder bg="white" radius="md">
+                      <Text fw={500} c="dimmed" mb="sm">
+                        Context:
+                      </Text>
+                      <Text size="md"
+                        style={{
+                          fontFamily: "monospace",
+                          padding: "10px",
+                          backgroundColor: "#f5f5f5",
+                          borderRadius: "4px",
+                          lineHeight: 1.5
+                        }}
+                      >
+                        {match.index > 10 ? (
+                          <>
+                            <span style={{ color: "#888" }}>
+                              ...
+                              {testString.substring(
+                                Math.max(0, match.index - 15),
+                                match.index
+                              )}
+                            </span>
+                            <span
+                              style={{
+                                backgroundColor: "rgba(77, 173, 255, 0.3)",
+                                fontWeight: 600,
+                                padding: "2px 4px",
+                                borderRadius: "2px"
+                              }}
+                            >
+                              {match.value}
+                            </span>
+                            <span style={{ color: "#888" }}>
+                              {testString.substring(
+                                match.index + match.value.length,
+                                Math.min(
+                                  testString.length,
+                                  match.index + match.value.length + 15
+                                )
+                              )}
+                              ...
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span
+                              style={{
+                                backgroundColor: "rgba(77, 173, 255, 0.3)",
+                                fontWeight: 600,
+                                padding: "2px 4px",
+                                borderRadius: "2px"
+                              }}
+                            >
+                              {match.value}
+                            </span>
+                            <span style={{ color: "#888" }}>
+                              {testString.substring(
+                                match.index + match.value.length,
+                                Math.min(
+                                  testString.length,
+                                  match.index + match.value.length + 15
+                                )
+                              )}
+                              ...
+                            </span>
+                          </>
+                        )}
+                      </Text>
+                    </Paper>
+                  </Paper>
+                ))}
+              </ScrollArea>
+            </Stack>
+          ) : (
+            <Alert 
+              icon={<IconInfoCircle size={rem(18)} />} 
+              color="gray"
+              p="md"
+              radius="md"
+            >
+              No matches found. Try adjusting your regular expression or test
+              string.
+            </Alert>
+          )}
+        </Paper>
+      )}
+
+      {/* No regex message */}
+      {!regex && (
+        <Alert 
+          icon={<IconInfoCircle size={rem(18)} />} 
+          color="blue"
+          p="md"
+          radius="md"
+          mt="xl"
+        >
+          Build your regex pattern using the tools above to see it tested here.
+        </Alert>
+      )}
+    </Paper>
+  );
+}

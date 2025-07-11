@@ -27,7 +27,7 @@ export default function RegexGeneratorPage() {
   const [regex, setRegex] = useState<string>("");
   const [flags, setFlags] = useState<string>("g");
   return (
-    <Container size="xl" py="xl">
+    <Container size="xl" py="xl" style={{ color: "white" }}>
       <Title order={1} mb="lg">
         <Text
           inherit
@@ -38,21 +38,63 @@ export default function RegexGeneratorPage() {
           Regex Generator
         </Text>
       </Title>
-
-      <Text c="dimmed" mb="xl">
+      <Text c="gray.4" mb="xl" size="lg">
         Build, test, and validate regular expressions with our visual regex
         builder. Choose from common patterns or create your own custom regex.
-      </Text>
-
+      </Text>{" "}
       <Grid gutter="md">
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
-            <Paper shadow="sm" p="md" radius="md" withBorder>
-              <Title order={3} mb="md">
+            {" "}
+            {/* Getting Started Guide - Always visible and more prominent */}
+            <Alert
+              icon={<IconAlertCircle size={rem(24)} />}
+              title="Getting Started"
+              color="blue"
+              radius="md"
+              p="lg"
+              styles={{
+                title: { fontSize: rem(18) },
+                message: { fontSize: rem(14) },
+                root: { backgroundColor: "#1c1c1c", color: "#ddd" },
+              }}
+            >
+              Select patterns from the pattern library or use the visual builder
+              below to create your regular expression. You can test your
+              expression in the tester section.
+            </Alert>
+            <RegexBuilder
+              regex={regex}
+              setRegex={setRegex}
+              flags={flags}
+              setFlags={setFlags}
+            />{" "}
+            {/* Your Regular Expression section moved below the builder */}
+            <Paper
+              shadow="sm"
+              p="md"
+              radius="md"
+              withBorder
+              style={{
+                background: "#242424",
+                color: "white",
+                border: "1px solid #333",
+              }}
+            >
+              <Title order={3} mb="md" style={{ color: "#4dadff" }}>
                 Your Regular Expression
               </Title>
               <Group wrap="nowrap" align="center">
-                <Code block style={{ flex: 1, fontSize: rem(16) }}>
+                <Code
+                  block
+                  style={{
+                    flex: 1,
+                    fontSize: rem(16),
+                    backgroundColor: "#1c1c1c",
+                    color: "#4dadff",
+                    border: "1px solid #444",
+                  }}
+                >
                   /{regex.replace(/\\/g, "\\\\")}/{flags}
                 </Code>
                 <CopyButton value={`/${regex}/${flags}`} timeout={2000}>
@@ -63,7 +105,7 @@ export default function RegexGeneratorPage() {
                       position="right"
                     >
                       <ActionIcon
-                        color={copied ? "teal" : "gray"}
+                        color={copied ? "teal" : "blue"}
                         onClick={copy}
                       >
                         {copied ? (
@@ -76,26 +118,7 @@ export default function RegexGeneratorPage() {
                   )}
                 </CopyButton>
               </Group>
-              {regex.length === 0 && (
-                <Alert
-                  mt="md"
-                  icon={<IconAlertCircle size="1rem" />}
-                  title="Getting Started"
-                  color="blue"
-                >
-                  Select patterns from the library or build your regex using the
-                  visual builder below.
-                </Alert>
-              )}
             </Paper>
-
-            <RegexBuilder
-              regex={regex}
-              setRegex={setRegex}
-              flags={flags}
-              setFlags={setFlags}
-            />
-
             <RegexTester regex={regex} flags={flags} />
           </Stack>
         </Grid.Col>{" "}
@@ -109,12 +132,28 @@ export default function RegexGeneratorPage() {
               height: "75vh",
               display: "flex",
               flexDirection: "column",
+              background: "#242424",
+              color: "white",
+              border: "1px solid #333",
             }}
           >
-            <Title order={3} mb="md">
+            <Title order={3} mb="md" style={{ color: "#4dadff" }}>
               Pattern Library
             </Title>
-            <div style={{ overflow: "auto", flex: 1 }}>
+            <div
+              style={{
+                overflow: "auto",
+                flex: 1,
+                "&::-webkit-scrollbar": {
+                  width: "8px",
+                  backgroundColor: "#333",
+                },
+                "&::-webkit-scrollbar-thumb": {
+                  backgroundColor: "#444",
+                  borderRadius: "4px",
+                },
+              }}
+            >
               <RegexPatternLibrary setRegex={setRegex} />
             </div>
           </Paper>

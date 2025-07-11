@@ -323,19 +323,46 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
       ],
     },
   ];
-
   return (
     <Stack>
-      <Accordion>
+      <Accordion
+        styles={{
+          item: {
+            backgroundColor: "#2c2c2c",
+            border: "1px solid #333",
+            borderRadius: "4px",
+            marginBottom: "8px",
+          },
+          control: {
+            backgroundColor: "#2c2c2c",
+            color: "#4dadff",
+            "&:hover": { backgroundColor: "#333" },
+          },
+          content: { backgroundColor: "#2c2c2c", color: "white" },
+          label: { color: "#ddd", fontWeight: 500 },
+          chevron: { color: "#4dadff" },
+        }}
+      >
         {patternCategories.map((category) => (
           <Accordion.Item key={category.category} value={category.category}>
             <Accordion.Control>{category.category}</Accordion.Control>
             <Accordion.Panel>
               <Stack gap="xs">
                 {category.patterns.map((pattern) => (
-                  <Stack key={pattern.name} gap="xs">
+                  <Stack
+                    key={pattern.name}
+                    gap="xs"
+                    p="xs"
+                    style={{
+                      backgroundColor: "#333",
+                      borderRadius: "4px",
+                      border: "1px solid #444",
+                    }}
+                  >
                     <Group justify="space-between" wrap="nowrap">
-                      <Text fw={500}>{pattern.name}</Text>
+                      <Text fw={500} c="gray.2">
+                        {pattern.name}
+                      </Text>
                       <Group gap="xs">
                         <Tooltip
                           label={
@@ -349,7 +376,7 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
                             color={
                               copiedPattern === pattern.pattern
                                 ? "teal"
-                                : "gray"
+                                : "blue"
                             }
                             onClick={() => handleCopy(pattern.pattern)}
                           >
@@ -362,31 +389,40 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
                         </Tooltip>
                       </Group>
                     </Group>{" "}
-                    <Text size="sm" c="dimmed">
+                    <Text size="sm" c="gray.4">
                       {pattern.description}
                     </Text>
                     {pattern.example && (
                       <Group>
-                        <Text size="sm" fw={500}>
+                        <Text size="sm" fw={500} c="gray.3">
                           Example:
                         </Text>
                         <Text
                           size="sm"
-                          c="dimmed"
+                          c="cyan.4"
                           style={{ fontStyle: "italic" }}
                         >
                           {pattern.example}
                         </Text>
                       </Group>
                     )}
-                    <Code block style={{ fontSize: rem(12) }}>
+                    <Code
+                      block
+                      style={{
+                        fontSize: rem(12),
+                        backgroundColor: "#1c1c1c",
+                        color: "#4dadff",
+                        border: "1px solid #444",
+                      }}
+                    >
                       {pattern.pattern}
                     </Code>
                     <Button
-                      variant="light"
+                      variant="filled"
                       size="xs"
                       onClick={() => handleSelectPattern(pattern.pattern)}
                       fullWidth
+                      color="blue"
                     >
                       Use This Pattern
                     </Button>
