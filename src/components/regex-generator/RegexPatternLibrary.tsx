@@ -56,7 +56,8 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
           example: "example.com",
         },
       ],
-    },    {
+    },
+    {
       category: "Dates & Times",
       patterns: [
         {
@@ -82,7 +83,8 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
           pattern: "(?:0[1-9]|[12]\\d|3[01])-(?:0[1-9]|1[0-2])-\\d{4}",
           description: "European date format with hyphens DD-MM-YYYY",
           example: "11-07-2025",
-        },        {
+        },
+        {
           name: "Date (DD.MM.YYYY)",
           pattern: "(?:0[1-9]|[12]\\d|3[01])\\.(?:0[1-9]|1[0-2])\\.\\d{4}",
           description: "European date format with dots DD.MM.YYYY",
@@ -96,13 +98,16 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
         },
         {
           name: "Date (Flexible)",
-          pattern: "(?:0[1-9]|[12]\\d|3[01])[\\/\\.-](?:0[1-9]|1[0-2])[\\/\\.-]\\d{4}",
-          description: "Flexible date format that accepts slash, dot, or hyphen separators",
+          pattern:
+            "(?:0[1-9]|[12]\\d|3[01])[\\/\\.-](?:0[1-9]|1[0-2])[\\/\\.-]\\d{4}",
+          description:
+            "Flexible date format that accepts slash, dot, or hyphen separators",
           example: "11/07/2025, 11-07-2025, 11.07.2025",
         },
         {
           name: "ISO Date (With Time)",
-          pattern: "\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|[+-](?:[01]\\d|2[0-3]):[0-5]\\d)",
+          pattern:
+            "\\d{4}-(?:0[1-9]|1[0-2])-(?:0[1-9]|[12]\\d|3[01])T(?:[01]\\d|2[0-3]):[0-5]\\d:[0-5]\\d(?:\\.\\d+)?(?:Z|[+-](?:[01]\\d|2[0-3]):[0-5]\\d)",
           description: "ISO 8601 date-time format with timezone",
           example: "2025-07-11T14:30:45Z",
         },
@@ -131,7 +136,8 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
           example: "14:30",
         },
       ],
-    },    {
+    },
+    {
       category: "Numbers & Currency",
       patterns: [
         {
@@ -145,7 +151,8 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
           pattern: "[-+]?\\d*\\.\\d+",
           description: "Matches decimal numbers with decimal point",
           example: "3.14159, -0.5, +2.71",
-        },        {
+        },
+        {
           name: "Currency (USD)",
           pattern: "\\$\\d{1,3}(?:,\\d{3})*(?:\\.\\d{2})?",
           description: "US Dollar format with optional commas and cents",
@@ -154,15 +161,18 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
         {
           name: "Currency (EUR - Before)",
           pattern: "€\\s?[-]?\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2})?",
-          description: "Euro format with symbol before the amount, optional negative values",
+          description:
+            "Euro format with symbol before the amount, optional negative values",
           example: "€1.250,99, €-1.250,99, € 1.250,99",
         },
         {
           name: "Currency (EUR - After)",
           pattern: "[-]?\\d{1,3}(?:[.,]\\d{3})*(?:[.,]\\d{2})?\\s?€",
-          description: "Euro format with symbol after the amount, optional negative values",
+          description:
+            "Euro format with symbol after the amount, optional negative values",
           example: "1.250,99€, -1.250,99€, 1.250,99 €",
-        },        {
+        },
+        {
           name: "Percentage",
           pattern: "\\d+(?:\\.\\d+)?%",
           description: "Percentage values with optional decimal places",
@@ -171,11 +181,13 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
         {
           name: "Generic Money Amount",
           pattern: "[-]?(?:\\d{1,3}(?:[.,]\\d{3})*|\\d+)(?:[.,]\\d{1,2})?",
-          description: "Generic monetary amount with optional thousands separator and decimals",
+          description:
+            "Generic monetary amount with optional thousands separator and decimals",
           example: "1,234.56, 1.234,56, -99.99, 1000",
         },
       ],
-    },    {
+    },
+    {
       category: "Phone Numbers",
       patterns: [
         {
@@ -193,11 +205,13 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
         {
           name: "E.164 Phone Format",
           pattern: "\\+[1-9]\\d{1,14}",
-          description: "Standard international phone number format without spaces or dashes",
+          description:
+            "Standard international phone number format without spaces or dashes",
           example: "+12025551234",
         },
       ],
-    },    {
+    },
+    {
       category: "Code & Validation",
       patterns: [
         {
@@ -236,7 +250,8 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
         },
       ],
     },
-    {      category: "Document & ID Numbers",
+    {
+      category: "Document & ID Numbers",
       patterns: [
         {
           name: "IBAN",
@@ -258,8 +273,10 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
         },
         {
           name: "Credit Card Number",
-          pattern: "(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\\d{3})\\d{11})",
-          description: "Matches major credit card formats (Visa, Mastercard, Amex, Discover)",
+          pattern:
+            "(?:4[0-9]{12}(?:[0-9]{3})?|5[1-5][0-9]{14}|3[47][0-9]{13}|3(?:0[0-5]|[68][0-9])[0-9]{11}|6(?:011|5[0-9]{2})[0-9]{12}|(?:2131|1800|35\\d{3})\\d{11})",
+          description:
+            "Matches major credit card formats (Visa, Mastercard, Amex, Discover)",
           example: "4111111111111111",
         },
         {
@@ -283,7 +300,7 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
           name: "HTML Tag",
           pattern: "<([a-z]+)([^<]+)*(?:>(.*?)<\\/\\1>|\\s+\\/>)",
           description: "Matches HTML tags with their content",
-          example: "<div class=\"container\">Content</div>",
+          example: '<div class="container">Content</div>',
         },
         {
           name: "Sentence",
@@ -344,23 +361,27 @@ export function RegexPatternLibrary({ setRegex }: RegexPatternLibraryProps) {
                           </ActionIcon>
                         </Tooltip>
                       </Group>
-                    </Group>                    <Text size="sm" c="dimmed">
+                    </Group>{" "}
+                    <Text size="sm" c="dimmed">
                       {pattern.description}
                     </Text>
-                    
                     {pattern.example && (
                       <Group>
-                        <Text size="sm" fw={500}>Example:</Text>
-                        <Text size="sm" c="dimmed" style={{ fontStyle: 'italic' }}>
+                        <Text size="sm" fw={500}>
+                          Example:
+                        </Text>
+                        <Text
+                          size="sm"
+                          c="dimmed"
+                          style={{ fontStyle: "italic" }}
+                        >
                           {pattern.example}
                         </Text>
                       </Group>
                     )}
-
                     <Code block style={{ fontSize: rem(12) }}>
                       {pattern.pattern}
                     </Code>
-
                     <Button
                       variant="light"
                       size="xs"
