@@ -305,21 +305,21 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                 </Text>
               </Alert>{" "}
               <ScrollArea
-                h={250}
+                h={450}
                 type="auto"
                 offsetScrollbars
                 scrollbarSize={10}
                 styles={{
                   scrollbar: { backgroundColor: "#333" },
-                  thumb: { backgroundColor: "#444" },
+                  thumb: { backgroundColor: "#444", borderRadius: "4px" },
                 }}
               >
                 {matches.map((match, index) => (
                   <Paper
                     key={index}
-                    p="md"
+                    p="sm"
                     withBorder
-                    mb="md"
+                    mb="sm"
                     radius="md"
                     style={{
                       borderLeft: "4px solid #4dadff",
@@ -327,7 +327,7 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                       border: "1px solid #444",
                     }}
                   >
-                    <Group mb="md" justify="space-between">
+                    <Group mb="xs" justify="space-between">
                       <Group>
                         <Badge size="md" color="blue" variant="filled">
                           Match {index + 1}
@@ -350,27 +350,27 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                     >
                       <Text fw={500} size="sm" mb="sm" c="gray.3">
                         Matched Text:
-                      </Text>
+                      </Text>{" "}
                       <Code
                         block
-                        p="md"
+                        p="xs"
                         style={{
                           backgroundColor: "#1c1c1c",
                           color: "#4dadff",
-                          fontSize: rem(15),
+                          fontSize: rem(14),
                           border: "1px solid #444",
                         }}
                       >
                         "{match.value}"
                       </Code>
-                    </Paper>
+                    </Paper>{" "}
                     {match.groups && Object.keys(match.groups).length > 0 && (
                       <Paper
                         p="xs"
                         withBorder
                         mt="xs"
                         bg="#2c2c2c"
-                        style={{ border: "1px solid #444" }}
+                        style={{ border: "1px solid #444", marginBottom: "0" }}
                       >
                         <Text size="sm" fw={500} mb="xs" c="gray.3">
                           Capture Groups:
@@ -392,11 +392,11 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                         ))}
                       </Paper>
                     )}{" "}
-                    {/* Add context information */}
+                    {/* Add context information */}{" "}
                     <Paper
-                      p="md"
+                      p="xs"
                       withBorder
-                      mt="md"
+                      mt="xs"
                       radius="md"
                       bg="#2c2c2c"
                       style={{ border: "1px solid #444" }}
