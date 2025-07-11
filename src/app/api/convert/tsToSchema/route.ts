@@ -28,7 +28,20 @@ const SchemaConversionRequestSchema = z.object({
   }).optional(),
 });
 
+// Array to track compilation warnings
+const compilationWarnings: string[] = [];
+
+// Custom console.warn to capture warnings
+const originalConsoleWarn = console.warn;
+console.warn = function(...args) {
+  compilationWarnings.push(args.join(' '));
+  originalConsoleWarn.apply(console, args);
+};
+
 export async function POST(request: NextRequest) {
+  // Clear previous warnings
+  compilationWarnings.length = 0;
+  
   try {
     // Parse the request body
     const body = await request.json();
@@ -63,7 +76,11 @@ export async function POST(request: NextRequest) {
     
     if (conversionResult.error) {
       return NextResponse.json(
-        { success: false, error: conversionResult.error }, 
+        { 
+          success: false, 
+          error: conversionResult.error,
+          warnings: compilationWarnings.length > 0 ? compilationWarnings : undefined 
+        }, 
         { status: 400 }
       );
     }
@@ -99,6 +116,7 @@ export async function POST(request: NextRequest) {
         id: conversion.id,
         outputCode: conversionResult.code,
         language: OutputLanguage.JSON_SCHEMA,
+        warnings: compilationWarnings.length > 0 ? compilationWarnings : undefined
       },
     });
   } catch (error) {
@@ -108,7 +126,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { 
         success: false, 
-        error: "Failed to process TypeScript to JSON Schema conversion request" 
+        error: "Failed to process TypeScript to JSON Schema conversion request",
+        warnings: compilationWarnings.length > 0 ? compilationWarnings : undefined
       }, 
       { status: 500 }
     );

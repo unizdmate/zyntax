@@ -7,6 +7,10 @@ import * as path from "path";
 import * as os from "os";
 import * as fs from "fs";
 
+// Import source-map-support to prevent module not found warnings
+// This is conditionally imported by typescript-json-schema's dependencies
+import 'source-map-support/register';
+
 type SchemaConversionOptions = {
   typeName?: string;
   useRefs?: boolean;

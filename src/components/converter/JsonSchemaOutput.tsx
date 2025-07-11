@@ -1,18 +1,23 @@
 "use client";
 
-import { Box, Button, Group, Title, Tooltip } from "@mantine/core";
+import { Box, Button, Group, Title, Tooltip, Text, Alert } from "@mantine/core";
 import Editor from "@monaco-editor/react";
 import { useState } from "react";
 import { useColorScheme } from "@/app/providers";
+import { IconAlertCircle } from "@tabler/icons-react";
 
 interface JsonSchemaOutputProps {
   code: string;
   isLoading?: boolean;
+  error?: string | null;
+  warnings?: string[] | null;
 }
 
 export function JsonSchemaOutput({
   code,
   isLoading = false,
+  error = null,
+  warnings = null,
 }: JsonSchemaOutputProps) {
   const [isCopied, setIsCopied] = useState(false);
   const { colorScheme } = useColorScheme();
@@ -63,6 +68,35 @@ export function JsonSchemaOutput({
           </Button>
         </Tooltip>
       </Group>
+
+      {error && (
+        <Alert
+          icon={<IconAlertCircle size="1rem" />}
+          title="Error"
+          color="red"
+          variant="outline"
+          mb="md"
+        >
+          {error}
+        </Alert>
+      )}
+
+      {warnings && warnings.length > 0 && (
+        <Alert
+          icon={<IconAlertCircle size="1rem" />}
+          title="Warnings"
+          color="yellow"
+          variant="outline"
+          mb="md"
+        >
+          {warnings.map((warning, index) => (
+            <Text size="sm" key={index}>
+              {warning}
+            </Text>
+          ))}
+        </Alert>
+      )}
+
       <Box style={{ border: `1px solid ${borderColor}`, borderRadius: "4px" }}>
         <Editor
           height="400px"
