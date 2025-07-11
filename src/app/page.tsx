@@ -29,18 +29,12 @@ import {
 import { JsonInput } from "@/components/converter/JsonInput";
 import { TypeScriptOutput } from "@/components/converter/TypeScriptOutput";
 import { TypeScriptInput } from "@/components/converter/TypeScriptInput";
-import { JsonSchemaOutput } from "@/components/converter/JsonSchemaOutput";
 import { ConversionOptions } from "@/components/converter/ConversionOptions";
-import { SchemaConversionOptions } from "@/components/converter/SchemaConversionOptions";
-import {
-  useCreateConversion,
-  useCreateSchemaConversion,
-} from "@/data/use-conversions";
+import { useCreateConversion } from "@/data/use-conversions";
 import {
   ConversionOptions as ConversionOptionsType,
   OutputLanguage,
   ExportStrategy,
-  SchemaConversionOptions as SchemaConversionOptionsType,
 } from "@/types";
 import {
   IconAlertCircle,
@@ -84,35 +78,13 @@ export default function Home() {
     }
   );
 
-  // TypeScript to JSON Schema state
-  const [tsToSchemaOutput, setTsToSchemaOutput] = useState<string>("");
-  const [tsToSchemaError, setTsToSchemaError] = useState<string | null>(null);
-  const [tsToSchemaSuccessMessage, setTsToSchemaSuccessMessage] = useState<
-    string | null
-  >(null);
-  const [tsToSchemaTitle, setTsToSchemaTitle] = useState<string>(
-    "Untitled TS to Schema Conversion"
-  );
-  const [tsToSchemaOptions, setTsToSchemaOptions] =
-    useState<SchemaConversionOptionsType>({
-      typeName: "RootType",
-      useRefs: true,
-      required: true,
-      useTitleAsDescription: false,
-      additionalProperties: false,
-      indentationSpaces: 2,
-      exportStrategy: ExportStrategy.ALL,
-    });
-
   // Check if using dark mode
   const isDarkMode =
     colorScheme === "dark" ||
     (typeof window !== "undefined" &&
       window.matchMedia("(prefers-color-scheme: dark)").matches);
-
   // Use React Query hooks for creating conversions
   const createJsonToTsConversion = useCreateConversion();
-  const createTsToSchemaConversion = useCreateSchemaConversion();
 
   const handleJsonSubmit = async (jsonContent: string) => {
     setJsonToTsError(null);
@@ -141,40 +113,8 @@ export default function Home() {
     }
   };
 
-  const handleTypeScriptSubmit = async (tsContent: string) => {
-    setTsToSchemaError(null);
-    setTsToSchemaSuccessMessage(null);
-
-    try {
-      const result = await createTsToSchemaConversion.mutateAsync({
-        inputTypeScript: tsContent,
-        options: tsToSchemaOptions,
-        title: tsToSchemaTitle,
-      });
-
-      // Update the output with the converted code
-      setTsToSchemaOutput(result.outputCode);
-
-      // Show success message
-      if (status === "authenticated" && result.id) {
-        setTsToSchemaSuccessMessage(
-          `Conversion "${tsToSchemaTitle}" saved successfully!`
-        );
-      }
-    } catch (err) {
-      setTsToSchemaError((err as Error).message || "An error occurred");
-      console.error("TS to Schema conversion error:", err);
-    }
-  };
-
   const handleJsonToTsOptionsChange = (newOptions: ConversionOptionsType) => {
     setJsonToTsOptions(newOptions);
-  };
-
-  const handleTsToSchemaOptionsChange = (
-    newOptions: SchemaConversionOptionsType
-  ) => {
-    setTsToSchemaOptions(newOptions);
   };
 
   // Handler for tab change that ensures we never get null as a value
@@ -194,9 +134,9 @@ export default function Home() {
     },
     {
       icon: IconBrackets,
-      title: "JSON Schema",
+      title: "Flexible Output",
       description:
-        "Convert TypeScript types to JSON Schema for API validation and documentation.",
+        "Customize your TypeScript output with various formatting options and styles.",
     },
     {
       icon: IconHourglassHigh,
@@ -322,11 +262,12 @@ export default function Home() {
                     </ThemeIcon>
                   }
                 >
+                  {" "}
                   <List.Item>
                     <Text fw={500}>Accurate TypeScript types from JSON</Text>
                   </List.Item>
                   <List.Item>
-                    <Text fw={500}>JSON Schema from TypeScript types</Text>
+                    <Text fw={500}>Customizable output formats</Text>
                   </List.Item>
                   <List.Item>
                     <Text fw={500}>Save and share your conversions</Text>
@@ -480,10 +421,9 @@ export interface User {
             Try Our Converters
           </Title>
           <Text size="lg" c="dimmed" ta="center" mb="xl" maw={700} mx="auto">
-            Choose between JSON to TypeScript or TypeScript to JSON Schema
-            conversion
-          </Text>
-
+            {" "}
+            Convert your JSON to TypeScript with our powerful converter
+          </Text>{" "}
           <Tabs value={activeTab} onChange={handleTabChange} mb="xl">
             <Tabs.List justify="center">
               <Tabs.Tab
@@ -493,16 +433,8 @@ export interface User {
               >
                 JSON to TypeScript
               </Tabs.Tab>
-              <Tabs.Tab
-                value="tsToSchema"
-                leftSection={<IconBrandTypescript size={16} />}
-                rightSection={<IconBrackets size={16} />}
-              >
-                TypeScript to JSON Schema
-              </Tabs.Tab>
             </Tabs.List>
           </Tabs>
-
           {/* JSON to TypeScript Converter */}
           {activeTab === "jsonToTs" && (
             <Stack gap="xl">
@@ -557,75 +489,6 @@ export interface User {
                 >
                   <Group align="center" gap="xs">
                     <Text>{jsonToTsSuccessMessage}</Text>
-                    {status === "authenticated" && (
-                      <Button
-                        variant="light"
-                        size="xs"
-                        onClick={() => router.push("/dashboard")}
-                      >
-                        View in Dashboard
-                      </Button>
-                    )}
-                  </Group>
-                </Alert>
-              )}
-            </Stack>
-          )}
-
-          {/* TypeScript to JSON Schema Converter */}
-          {activeTab === "tsToSchema" && (
-            <Stack gap="xl">
-              {/* Options Panel */}
-              <Paper p="md" withBorder radius="md">
-                <Title order={4} mb="md">
-                  Customize TS to Schema Options
-                </Title>
-                <SchemaConversionOptions
-                  options={tsToSchemaOptions}
-                  onChange={handleTsToSchemaOptionsChange}
-                  conversionTitle={tsToSchemaTitle}
-                  onTitleChange={setTsToSchemaTitle}
-                  isAuthenticated={status === "authenticated"}
-                />
-              </Paper>
-
-              {/* Editors */}
-              <Grid>
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <TypeScriptInput
-                    onSubmit={handleTypeScriptSubmit}
-                    isLoading={createTsToSchemaConversion.isPending}
-                  />
-                </Grid.Col>
-
-                <Grid.Col span={{ base: 12, md: 6 }}>
-                  <JsonSchemaOutput
-                    code={tsToSchemaOutput}
-                    isLoading={createTsToSchemaConversion.isPending}
-                  />
-                </Grid.Col>
-              </Grid>
-
-              {tsToSchemaError && (
-                <Alert
-                  icon={<IconAlertCircle size="1rem" />}
-                  color="red"
-                  title="Error"
-                  mt="md"
-                >
-                  {tsToSchemaError}
-                </Alert>
-              )}
-
-              {tsToSchemaSuccessMessage && (
-                <Alert
-                  icon={<IconCheck size="1rem" />}
-                  color="green"
-                  title="Success"
-                  mt="md"
-                >
-                  <Group align="center" gap="xs">
-                    <Text>{tsToSchemaSuccessMessage}</Text>
                     {status === "authenticated" && (
                       <Button
                         variant="light"
@@ -761,15 +624,12 @@ export interface User {
           <Stack gap="lg" ta="center">
             <Title order={2}>
               Ready to Streamline Your Development Workflow?
-            </Title>
-
+            </Title>{" "}
             <Text size="lg" maw={700} mx="auto">
               Join thousands of developers who use Zyntax for code conversion
-              with perfect accuracy. Convert JSON to TypeScript or TypeScript to
-              JSON Schema effortlessly. Create a free account today to get
-              started.
+              with perfect accuracy. Convert JSON to TypeScript effortlessly.
+              Create a free account today to get started.
             </Text>
-
             <Group justify="center" mt="xl">
               <Button
                 component="a"

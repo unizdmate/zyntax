@@ -9,14 +9,12 @@ import {
   fetchConversion, 
   createConversion, 
   updateConversion, 
-  deleteConversion,
-  createSchemaConversion
+  deleteConversion
 } from './conversions-api';
 import { 
   Conversion, 
   ConversionOptions, 
-  OutputLanguage,
-  SchemaConversionOptions
+  OutputLanguage
 } from '@/types';
 
 // Query keys for caching
@@ -60,27 +58,6 @@ export function useCreateConversion() {
       language: OutputLanguage;
       title?: string;
     }) => createConversion(inputJson, options, language, title),
-    onSuccess: () => {
-      // Invalidate and refetch conversions list when a new conversion is created
-      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.conversions] });
-    },
-  });
-}
-
-// Hook to create a TypeScript to JSON Schema conversion
-export function useCreateSchemaConversion() {
-  const queryClient = useQueryClient();
-  
-  return useMutation({
-    mutationFn: ({
-      inputTypeScript,
-      options,
-      title,
-    }: {
-      inputTypeScript: string;
-      options: SchemaConversionOptions;
-      title?: string;
-    }) => createSchemaConversion(inputTypeScript, options, title),
     onSuccess: () => {
       // Invalidate and refetch conversions list when a new conversion is created
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.conversions] });

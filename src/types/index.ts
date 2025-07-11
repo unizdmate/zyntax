@@ -14,7 +14,6 @@ export enum ConversionType {
   JSON_TO_TS = "JSON_TO_TS",
   JSON_TO_PYTHON = "JSON_TO_PYTHON",
   JSON_TO_JAVA = "JSON_TO_JAVA",
-  TS_TO_SCHEMA = "TS_TO_SCHEMA", // New conversion type
   REGEX_GENERATOR = "REGEX_GENERATOR", // Regex generator type
 }
 
@@ -22,7 +21,6 @@ export enum OutputLanguage {
   TYPESCRIPT = "TypeScript",
   PYTHON = "Python",
   JAVA = "Java",
-  JSON_SCHEMA = "JSON Schema", // New output language
 }
 
 export enum ExportStrategy {
@@ -38,15 +36,7 @@ export interface ConversionOptions {
   useSemicolons?: boolean;
   exportStrategy?: ExportStrategy;
   indentationSpaces?: number;
-  extractNestedTypes?: boolean; // New option to extract nested types into separate interfaces/types
-}
-
-export interface SchemaConversionOptions extends Pick<ConversionOptions, 'indentationSpaces' | 'exportStrategy'> {
-  typeName?: string;
-  useRefs?: boolean;
-  required?: boolean;
-  useTitleAsDescription?: boolean;
-  additionalProperties?: boolean;
+  extractNestedTypes?: boolean; 
 }
 
 export interface Conversion {
@@ -70,13 +60,6 @@ export interface ApiResponse<T> {
 export interface ConversionRequest {
   inputJson: string;
   options: ConversionOptions;
-  language: OutputLanguage;
-  title?: string;
-}
-
-export interface SchemaConversionRequest {
-  inputTypeScript: string;
-  options: SchemaConversionOptions;
   language: OutputLanguage;
   title?: string;
 }

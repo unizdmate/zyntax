@@ -3,9 +3,7 @@ import {
   Conversion, 
   ConversionOptions, 
   ConversionRequest, 
-  OutputLanguage,
-  SchemaConversionOptions,
-  SchemaConversionRequest 
+  OutputLanguage 
 } from '@/types';
 
 // Types for API responses
@@ -66,41 +64,6 @@ export const createConversion = async (
   }
   
   return response.data.data;
-};
-
-// Create a new TypeScript to JSON Schema conversion
-export const createSchemaConversion = async (
-  inputTypeScript: string,
-  options: SchemaConversionOptions,
-  title?: string
-): Promise<{ id: string; outputCode: string }> => {
-  const payload: SchemaConversionRequest = {
-    inputTypeScript,
-    options,
-    language: OutputLanguage.JSON_SCHEMA,
-    title,
-  };
-  
-  try {
-    const response = await apiClient.post<ApiResponse<{ id: string; outputCode: string }>>(
-      '/convert/tsToSchema',
-      payload
-    );
-    
-    // Add debug logs
-    console.log('TS to Schema conversion response:', response.data);
-    
-    if (!response.data.success || !response.data.data) {
-      throw new Error(response.data.error || 'Failed to create schema conversion');
-    }
-    
-    // Ensure we're returning only the expected data structure
-    const { id, outputCode } = response.data.data;
-    return { id, outputCode };
-  } catch (error) {
-    console.error('Schema conversion API error:', error);
-    throw error;
-  }
 };
 
 // Update a conversion title
