@@ -17,18 +17,28 @@ import {
   rem,
   Alert,
   ScrollArea,
+  useMantineTheme,
 } from "@mantine/core";
 import { IconCheck, IconCopy, IconAlertCircle } from "@tabler/icons-react";
 // Import components directly using relative paths until Next.js builds them properly
 import { RegexBuilder } from "../../components/regex-generator/RegexBuilder";
 import { RegexTester } from "../../components/regex-generator/RegexTester";
 import { RegexPatternLibrary } from "../../components/regex-generator/RegexPatternLibrary";
+import { useColorScheme } from "@/app/providers";
 
 export default function RegexGeneratorPage() {
   const [regex, setRegex] = useState<string>("");
   const [flags, setFlags] = useState<string>("g");
-  return (
-    <Container size="xl" py="xl" style={{ color: "white" }}>
+  const { colorScheme } = useColorScheme();
+  const theme = useMantineTheme();
+  
+  // Determine if we're in dark mode
+  const isDarkMode = 
+    colorScheme === "dark" ||
+    (colorScheme === "auto" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);  return (
+    <Container size="xl" py="xl" style={{ color: isDarkMode ? theme.white : theme.black }}>
       <Title order={1} mb="lg">
         <Text
           inherit
@@ -39,7 +49,7 @@ export default function RegexGeneratorPage() {
           Regex Generator
         </Text>
       </Title>
-      <Text c="gray.4" mb="xl" size="lg">
+      <Text c={isDarkMode ? "gray.4" : "gray.6"} mb="xl" size="lg">
         Build, test, and validate regular expressions with our visual regex
         builder. Choose from common patterns or create your own custom regex.
       </Text>{" "}
@@ -47,19 +57,21 @@ export default function RegexGeneratorPage() {
         <Grid.Col span={{ base: 12, md: 8 }}>
           <Stack gap="md">
             {" "}
-            {/* Getting Started Guide - Always visible and more prominent */}
-            <Paper
+            {/* Getting Started Guide - Always visible and more prominent */}            <Paper
               p="md"
               radius="md"
               withBorder
-              style={{ backgroundColor: "#1c1c1c", border: "1px solid #333" }}
+              style={{ 
+                backgroundColor: isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0],
+                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`
+              }}
             >
               <Group align="center" mb="xs">
-                <Title order={3} style={{ color: "#4dadff" }}>
+                <Title order={3} style={{ color: theme.colors.blue[5] }}>
                   Getting Started
                 </Title>
               </Group>
-              <Text size="sm" c="gray.3" pl={4}>
+              <Text size="sm" c={isDarkMode ? "gray.3" : "gray.7"} pl={4}>
                 Select patterns from the pattern library or use the visual
                 builder below to create your regular expression. You can test
                 your expression in the tester section.
@@ -71,19 +83,18 @@ export default function RegexGeneratorPage() {
               flags={flags}
               setFlags={setFlags}
             />{" "}
-            {/* Your Regular Expression section moved below the builder */}
-            <Paper
+            {/* Your Regular Expression section moved below the builder */}            <Paper
               shadow="sm"
               p="md"
               radius="md"
               withBorder
               style={{
-                background: "#242424",
-                color: "white",
-                border: "1px solid #333",
+                background: isDarkMode ? theme.colors.dark[7] : theme.white,
+                color: isDarkMode ? theme.white : theme.black,
+                border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
               }}
             >
-              <Title order={3} mb="md" style={{ color: "#4dadff" }}>
+              <Title order={3} mb="md" style={{ color: theme.colors.blue[5] }}>
                 Your Regular Expression
               </Title>
               <Group wrap="nowrap" align="center">
@@ -92,9 +103,9 @@ export default function RegexGeneratorPage() {
                   style={{
                     flex: 1,
                     fontSize: rem(16),
-                    backgroundColor: "#1c1c1c",
-                    color: "#4dadff",
-                    border: "1px solid #444",
+                    backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[0],
+                    color: theme.colors.blue[5],
+                    border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}`,
                   }}
                 >
                   /{regex.replace(/\\/g, "\\\\")}/{flags}
@@ -129,18 +140,17 @@ export default function RegexGeneratorPage() {
             shadow="sm"
             p="md"
             radius="md"
-            withBorder
-            style={{
+            withBorder            style={{
               height: "75vh",
               display: "flex",
               flexDirection: "column",
-              background: "#242424",
-              color: "white",
-              border: "1px solid #333",
+              background: isDarkMode ? theme.colors.dark[7] : theme.white,
+              color: isDarkMode ? theme.white : theme.black,
+              border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
             }}
           >
             {" "}
-            <Title order={3} mb="md" style={{ color: "#4dadff" }}>
+            <Title order={3} mb="md" style={{ color: theme.colors.blue[5] }}>
               Pattern Library
             </Title>
             <ScrollArea
@@ -149,8 +159,8 @@ export default function RegexGeneratorPage() {
               offsetScrollbars
               scrollbarSize={8}
               styles={{
-                scrollbar: { backgroundColor: "#333" },
-                thumb: { backgroundColor: "#444", borderRadius: "4px" },
+                scrollbar: { backgroundColor: isDarkMode ? theme.colors.dark[5] : theme.colors.gray[1] },
+                thumb: { backgroundColor: isDarkMode ? theme.colors.dark[4] : theme.colors.gray[4], borderRadius: "4px" },
               }}
             >
               <RegexPatternLibrary setRegex={setRegex} />

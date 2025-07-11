@@ -14,6 +14,7 @@ import {
   ScrollArea,
   rem,
   Stack,
+  useMantineTheme,
 } from "@mantine/core";
 import { IconAlertCircle, IconInfoCircle } from "@tabler/icons-react";
 import { RegexMatch } from "@/types";
@@ -21,6 +22,7 @@ import {
   getAllMatches,
   isValidRegex,
 } from "@/lib/regex-generator/regexService";
+import { useColorScheme } from "@/app/providers";
 
 interface RegexTesterProps {
   regex: string;
@@ -28,6 +30,16 @@ interface RegexTesterProps {
 }
 
 export function RegexTester({ regex, flags }: RegexTesterProps) {
+  const { colorScheme } = useColorScheme();
+  const theme = useMantineTheme();
+  
+  // Determine if we're in dark mode
+  const isDarkMode = 
+    colorScheme === "dark" ||
+    (colorScheme === "auto" &&
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-color-scheme: dark)").matches);
+  
   const [testString, setTestString] = useState<string>(
     "Hello, test@example.com is an email address! Visit https://example.com for more info.\n" +
       "Call us at 555-123-4567 or on Jan-15-2025."
@@ -98,15 +110,17 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
 
       // Add highlighted match
       result.push(
-        <span
-          key={`match-${match.index}`}
-          style={{
-            backgroundColor: "rgba(77, 171, 255, 0.4)",
+        <span          key={`match-${match.index}`}          style={{
+            backgroundColor: isDarkMode 
+              ? `rgba(${parseInt(theme.colors.blue[5].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[5].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[5].slice(5, 7), 16)}, 0.3)`
+              : `rgba(${parseInt(theme.colors.blue[3].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[3].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[3].slice(5, 7), 16)}, 0.2)`,
             padding: "2px 4px",
             borderRadius: "3px",
             fontWeight: 600,
-            color: "#fff",
-            border: "1px solid rgba(77, 171, 255, 0.6)",
+            color: isDarkMode ? theme.white : theme.colors.blue[6],
+            border: `1px solid ${isDarkMode 
+              ? `rgba(${parseInt(theme.colors.blue[5].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[5].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[5].slice(5, 7), 16)}, 0.5)`
+              : `rgba(${parseInt(theme.colors.blue[4].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[4].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[4].slice(5, 7), 16)}, 0.3)`}`,
           }}
         >
           {testString.substring(match.index, match.index + match.value.length)}
@@ -124,21 +138,19 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
     }
 
     return result;
-  };
-  return (
+  };  return (
     <Paper
       shadow="sm"
       p="xl"
       radius="md"
       withBorder
       style={{
-        background: "#242424",
-        color: "white",
-        border: "1px solid #333",
+        background: isDarkMode ? theme.colors.dark[7] : theme.white,
+        color: isDarkMode ? theme.white : theme.black,
+        border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
       }}
     >
-      <Group justify="center" mb="xl">
-        <Title order={3} style={{ color: "#4dadff" }}>
+      <Group justify="center" mb="xl">        <Title order={3} style={{ color: theme.colors.blue[5] }}>
           Regex Tester
         </Title>
         <Badge
@@ -150,34 +162,34 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
             ? `${matches.length} match${matches.length !== 1 ? "es" : ""}`
             : "No matches yet"}
         </Badge>
-      </Group>
-      <Alert
+      </Group>      <Alert
         icon={<IconInfoCircle size={rem(18)} />}
         color="blue"
         variant="light"
         mb="lg"
         p="md"
         radius="md"
-        style={{ backgroundColor: "#1c1c1c", color: "#ddd" }}
+        style={{ 
+          backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0], 
+          color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7]
+        }}
       >
         Enter sample text below to test your regular expression and see
         highlighted matches{" "}
-      </Alert>
-      <Paper
+      </Alert>      <Paper
         p="md"
         withBorder
         radius="md"
         mb="xl"
         style={{
-          background: "#2c2c2c",
-          borderLeft: "4px solid #228be6",
-          border: "1px solid #333",
+          background: isDarkMode ? theme.colors.dark[6] : theme.colors.gray[0],
+          borderLeft: `4px solid ${theme.colors.blue[6]}`,
+          border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}`,
         }}
       >
         <Stack gap="lg" mb="md">
           <Textarea
-            label={
-              <Text fw={500} size="md" c="gray.3">
+            label={              <Text fw={500} size="md" c={isDarkMode ? "gray.3" : "gray.7"}>
                 Test String
               </Text>
             }
@@ -188,20 +200,18 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
             value={testString}
             onChange={(e) => setTestString(e.currentTarget.value)}
             styles={{
-              root: { marginBottom: rem(8) },
-              input: {
+              root: { marginBottom: rem(8) },              input: {
                 fontSize: rem(15),
                 lineHeight: 1.6,
-                backgroundColor: "#333",
-                color: "white",
+                backgroundColor: isDarkMode ? theme.colors.dark[5] : theme.colors.gray[1],
+                color: isDarkMode ? theme.white : theme.black,
               },
-              description: { color: "#aaa" },
+              description: { color: isDarkMode ? theme.colors.gray[5] : theme.colors.gray[6] },
             }}
             size="md"
           />
 
-          <Group gap="sm" mt="sm">
-            <Text size="sm" fw={500} c="gray.4">
+          <Group gap="sm" mt="sm">            <Text size="sm" fw={500} c={isDarkMode ? "gray.4" : "gray.6"}>
               Example text:
             </Text>
             {[
@@ -225,7 +235,7 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
               <Badge
                 key={i}
                 variant="outline"
-                style={{ cursor: "pointer", borderColor: "#4dadff" }}
+                style={{ cursor: "pointer", borderColor: theme.colors.blue[5] }}
                 onClick={() => setTestString(example.text)}
                 size="md"
                 radius="md"
@@ -238,64 +248,65 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
           </Group>
         </Stack>
       </Paper>{" "}
-      {error && (
-        <Alert
+      {error && (        <Alert
           icon={<IconAlertCircle size={rem(18)} />}
           title="Regex Error"
           color="red"
           mb="lg"
           p="md"
           radius="md"
-          style={{ backgroundColor: "#301b1b", color: "#ff8080" }}
+          style={{ 
+            backgroundColor: isDarkMode ? theme.colors.red[9] : theme.colors.red[0], 
+            color: isDarkMode ? theme.colors.red[2] : theme.colors.red[7]
+          }}
         >
           {error}
         </Alert>
       )}{" "}
-      {regex && !error && (
-        <Paper
+      {regex && !error && (        <Paper
           p="lg"
           withBorder
           mb="lg"
           mt="lg"
           radius="md"
-          style={{ background: "#2c2c2c", border: "1px solid #333" }}
-        >
-          <Title order={4} mb="lg" style={{ color: "#4dadff" }}>
+          style={{ 
+            background: isDarkMode ? theme.colors.dark[6] : theme.colors.gray[0], 
+            border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}` 
+          }}
+        >          <Title order={4} mb="lg" style={{ color: theme.colors.blue[5] }}>
             Results
-          </Title>
-          <Paper
+          </Title><Paper
             p="lg"
             withBorder
             radius="md"
-            bg="#333"
+            bg={isDarkMode ? theme.colors.dark[8] : theme.colors.gray[1]}
             mb="xl"
-            style={{ lineHeight: 1.7, border: "1px solid #444" }}
-          >
-            <Text size="md" c="gray.2">
+            style={{ lineHeight: 1.7, border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[4]}` }}
+          >            <Text size="md" c={isDarkMode ? "gray.2" : "gray.8"}>
               {renderHighlightedString()}
             </Text>
           </Paper>
           <Divider my="lg" size="sm" color="gray.7" />
-          <Group mb="md">
-            <Text fw={600} size="lg" c="gray.2">
+          <Group mb="md">            <Text fw={600} size="lg" c={isDarkMode ? "gray.2" : "gray.8"}>
               Found {matches.length} match{matches.length !== 1 ? "es" : ""}
             </Text>
           </Group>{" "}
           {matches.length > 0 ? (
             <Stack>
-              <Group justify="space-between">
-                <Text size="sm" fw={500} c="gray.3">
+              <Group justify="space-between">                <Text size="sm" fw={500} c={isDarkMode ? "gray.3" : "gray.7"}>
                   Matched Pattern Information:
                 </Text>
                 <Badge color="green" size="lg" variant="filled">
                   {matches.length} match{matches.length !== 1 ? "es" : ""}
                 </Badge>
-              </Group>
-              <Alert
+              </Group>              <Alert
                 icon={<IconInfoCircle size="1rem" />}
                 color="blue"
                 variant="light"
-                style={{ backgroundColor: "#1c1c1c", color: "#ddd" }}
+                style={{ 
+                  backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0], 
+                  color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7] 
+                }}
               >
                 <Text size="sm">
                   Your regex pattern successfully matched the highlighted text.
@@ -308,31 +319,28 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                 h={450}
                 type="auto"
                 offsetScrollbars
-                scrollbarSize={10}
-                styles={{
-                  scrollbar: { backgroundColor: "#333" },
-                  thumb: { backgroundColor: "#444", borderRadius: "4px" },
+                scrollbarSize={10}                styles={{
+                  scrollbar: { backgroundColor: isDarkMode ? theme.colors.dark[5] : theme.colors.gray[1] },
+                  thumb: { backgroundColor: isDarkMode ? theme.colors.dark[4] : theme.colors.gray[4], borderRadius: "4px" },
                 }}
               >
-                {matches.map((match, index) => (
-                  <Paper
+                {matches.map((match, index) => (                  <Paper
                     key={index}
                     p="sm"
                     withBorder
                     mb="sm"
                     radius="md"
                     style={{
-                      borderLeft: "4px solid #4dadff",
-                      backgroundColor: "#333",
-                      border: "1px solid #444",
+                      borderLeft: `4px solid ${theme.colors.blue[5]}`,
+                      backgroundColor: isDarkMode ? theme.colors.dark[5] : theme.colors.gray[1],
+                      border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}`,
                     }}
                   >
                     <Group mb="xs" justify="space-between">
                       <Group>
                         <Badge size="md" color="blue" variant="filled">
                           Match {index + 1}
-                        </Badge>
-                        <Text size="sm" fw={500} c="gray.3">
+                        </Badge>                        <Text size="sm" fw={500} c={isDarkMode ? "gray.3" : "gray.7"}>
                           Position: {match.index}
                         </Text>
                       </Group>
@@ -340,50 +348,42 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                         Length: {match.value.length} char
                         {match.value.length !== 1 ? "s" : ""}
                       </Badge>
-                    </Group>
-                    <Paper
+                    </Group>                    <Paper
                       p="md"
                       withBorder
                       radius="md"
-                      bg="#2c2c2c"
-                      style={{ border: "1px solid #444" }}
-                    >
-                      <Text fw={500} size="sm" mb="sm" c="gray.3">
+                      bg={isDarkMode ? theme.colors.dark[6] : theme.colors.gray[0]}
+                      style={{ border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}` }}
+                    >                      <Text fw={500} size="sm" mb="sm" c={isDarkMode ? "gray.3" : "gray.7"}>
                         Matched Text:
-                      </Text>{" "}
-                      <Code
+                      </Text>{" "}                      <Code
                         block
-                        p="xs"
-                        style={{
-                          backgroundColor: "#1c1c1c",
-                          color: "#4dadff",
+                        p="xs"                        style={{
+                          backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0],
+                          color: theme.colors.blue[5],
                           fontSize: rem(14),
-                          border: "1px solid #444",
+                          border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[4]}`,
                         }}
                       >
                         "{match.value}"
                       </Code>
                     </Paper>{" "}
-                    {match.groups && Object.keys(match.groups).length > 0 && (
-                      <Paper
+                    {match.groups && Object.keys(match.groups).length > 0 && (                      <Paper
                         p="xs"
                         withBorder
                         mt="xs"
-                        bg="#2c2c2c"
-                        style={{ border: "1px solid #444", marginBottom: "0" }}
-                      >
-                        <Text size="sm" fw={500} mb="xs" c="gray.3">
+                        bg={isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0]}
+                        style={{ border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}`, marginBottom: "0" }}
+                      >                        <Text size="sm" fw={500} mb="xs" c={isDarkMode ? "gray.3" : "gray.7"}>
                           Capture Groups:
                         </Text>
                         {Object.entries(match.groups).map(([name, value]) => (
                           <Group key={name} mt="xs">
                             <Badge variant="filled" size="sm" color="blue">
                               {name}
-                            </Badge>
-                            <Code
-                              style={{
-                                backgroundColor: "#1c1c1c",
-                                color: "#ddd",
+                            </Badge>                            <Code                              style={{
+                                backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0],
+                                color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7],
                               }}
                             >
                               "{value}"
@@ -392,51 +392,45 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                         ))}
                       </Paper>
                     )}{" "}
-                    {/* Add context information */}{" "}
-                    <Paper
+                    {/* Add context information */}{" "}                    <Paper
                       p="xs"
                       withBorder
                       mt="xs"
                       radius="md"
-                      bg="#2c2c2c"
-                      style={{ border: "1px solid #444" }}
-                    >
-                      <Text fw={500} size="sm" mb="sm" c="gray.3">
+                      bg={isDarkMode ? theme.colors.dark[7] : theme.colors.gray[0]}
+                      style={{ border: `1px solid ${isDarkMode ? theme.colors.dark[4] : theme.colors.gray[3]}` }}
+                    >                      <Text fw={500} size="sm" mb="sm" c={isDarkMode ? "gray.3" : "gray.7"}>
                         Context:
-                      </Text>
-                      <Text
-                        size="md"
-                        style={{
+                      </Text><Text
+                        size="md"                        style={{
                           fontFamily: "monospace",
                           padding: "10px",
-                          backgroundColor: "#1c1c1c",
-                          color: "#ddd",
-                          borderRadius: "4px",
+                          backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0],
+                          color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7],
+                          borderRadius: theme.radius.sm,
                           lineHeight: 1.5,
-                          border: "1px solid #333",
+                          border: `1px solid ${isDarkMode ? theme.colors.dark[5] : theme.colors.gray[3]}`,
                         }}
                       >
                         {match.index > 0 ? (
-                          <>
-                            <span style={{ color: "#888" }}>
+                          <>                            <span style={{ color: isDarkMode ? theme.colors.gray[6] : theme.colors.gray[5] }}>
                               ...
                               {testString.substring(
                                 Math.max(0, match.index - 15),
                                 match.index
                               )}
-                            </span>
-                            <span
-                              style={{
-                                backgroundColor: "rgba(77, 171, 247, 0.3)",
+                            </span>                            <span                              style={{
+                                backgroundColor: isDarkMode 
+                                  ? `rgba(${parseInt(theme.colors.blue[5].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[5].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[5].slice(5, 7), 16)}, 0.3)`
+                                  : `rgba(${parseInt(theme.colors.blue[3].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[3].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[3].slice(5, 7), 16)}, 0.2)`,
                                 fontWeight: 600,
                                 padding: "2px 4px",
                                 borderRadius: "2px",
-                                color: "#fff",
+                                color: isDarkMode ? theme.white : theme.colors.blue[6],
                               }}
                             >
                               {match.value}
-                            </span>
-                            <span style={{ color: "#888" }}>
+                            </span>                            <span style={{ color: isDarkMode ? theme.colors.gray[5] : theme.colors.gray[6] }}>
                               {testString.substring(
                                 match.index + match.value.length,
                                 Math.min(
@@ -448,18 +442,17 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                             </span>
                           </>
                         ) : (
-                          <>
-                            <span
-                              style={{
-                                backgroundColor: "rgba(77, 171, 247, 0.3)",
+                          <>                            <span                              style={{
+                                backgroundColor: isDarkMode 
+                                  ? `rgba(${parseInt(theme.colors.blue[5].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[5].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[5].slice(5, 7), 16)}, 0.3)`
+                                  : `rgba(${parseInt(theme.colors.blue[3].slice(1, 3), 16)}, ${parseInt(theme.colors.blue[3].slice(3, 5), 16)}, ${parseInt(theme.colors.blue[3].slice(5, 7), 16)}, 0.2)`,
                                 fontWeight: 600,
                                 padding: "0 2px",
-                                color: "#fff",
+                                color: isDarkMode ? theme.white : theme.colors.blue[6],
                               }}
                             >
                               {match.value}
-                            </span>
-                            <span style={{ color: "#888" }}>
+                            </span>                            <span style={{ color: isDarkMode ? theme.colors.gray[5] : theme.colors.gray[6] }}>
                               {testString.substring(
                                 match.index + match.value.length,
                                 Math.min(
@@ -477,13 +470,15 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
                 ))}
               </ScrollArea>
             </Stack>
-          ) : (
-            <Alert
+          ) : (            <Alert
               icon={<IconInfoCircle size={rem(18)} />}
               color="gray"
               p="md"
               radius="md"
-              style={{ backgroundColor: "#1c1c1c", color: "#ddd" }}
+              style={{ 
+                backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.gray[1], 
+                color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7] 
+              }}
             >
               No matches found. Try adjusting your regular expression or test
               string.
@@ -491,14 +486,16 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
           )}
         </Paper>
       )}
-      {!regex && (
-        <Alert
+      {!regex && (        <Alert
           icon={<IconInfoCircle size={rem(18)} />}
           color="blue"
           p="md"
           radius="md"
           mt="xl"
-          style={{ backgroundColor: "#1c1c1c", color: "#ddd" }}
+          style={{ 
+            backgroundColor: isDarkMode ? theme.colors.dark[9] : theme.colors.blue[0], 
+            color: isDarkMode ? theme.colors.gray[3] : theme.colors.gray[7] 
+          }}
         >
           Build your regex pattern using the tools above to see it tested here.
         </Alert>
