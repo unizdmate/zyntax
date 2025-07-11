@@ -16,6 +16,7 @@ import {
   ActionIcon,
   rem,
   Alert,
+  ScrollArea,
 } from "@mantine/core";
 import { IconCheck, IconCopy, IconAlertCircle } from "@tabler/icons-react";
 // Import components directly using relative paths until Next.js builds them properly
@@ -47,22 +48,23 @@ export default function RegexGeneratorPage() {
           <Stack gap="md">
             {" "}
             {/* Getting Started Guide - Always visible and more prominent */}
-            <Alert
-              icon={<IconAlertCircle size={rem(24)} />}
-              title="Getting Started"
-              color="blue"
+            <Paper
+              p="md"
               radius="md"
-              p="lg"
-              styles={{
-                title: { fontSize: rem(18) },
-                message: { fontSize: rem(14) },
-                root: { backgroundColor: "#1c1c1c", color: "#ddd" },
-              }}
+              withBorder
+              style={{ backgroundColor: "#1c1c1c", border: "1px solid #333" }}
             >
-              Select patterns from the pattern library or use the visual builder
-              below to create your regular expression. You can test your
-              expression in the tester section.
-            </Alert>
+              <Group align="center" mb="xs">
+                <Title order={3} style={{ color: "#4dadff" }}>
+                  Getting Started
+                </Title>
+              </Group>
+              <Text size="sm" c="gray.3" pl={4}>
+                Select patterns from the pattern library or use the visual
+                builder below to create your regular expression. You can test
+                your expression in the tester section.
+              </Text>
+            </Paper>
             <RegexBuilder
               regex={regex}
               setRegex={setRegex}
@@ -137,25 +139,22 @@ export default function RegexGeneratorPage() {
               border: "1px solid #333",
             }}
           >
+            {" "}
             <Title order={3} mb="md" style={{ color: "#4dadff" }}>
               Pattern Library
             </Title>
-            <div
-              style={{
-                overflow: "auto",
-                flex: 1,
-                "&::-webkit-scrollbar": {
-                  width: "8px",
-                  backgroundColor: "#333",
-                },
-                "&::-webkit-scrollbar-thumb": {
-                  backgroundColor: "#444",
-                  borderRadius: "4px",
-                },
+            <ScrollArea
+              h="100%"
+              type="auto"
+              offsetScrollbars
+              scrollbarSize={8}
+              styles={{
+                scrollbar: { backgroundColor: "#333" },
+                thumb: { backgroundColor: "#444", borderRadius: "4px" },
               }}
             >
               <RegexPatternLibrary setRegex={setRegex} />
-            </div>
+            </ScrollArea>
           </Paper>
         </Grid.Col>
       </Grid>

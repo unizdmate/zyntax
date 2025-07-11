@@ -62,18 +62,31 @@ export function RegexTester({ regex, flags }: RegexTesterProps) {
       setError((err as Error).message);
       setMatches([]);
     }
-  }, [regex, flags, testString]);
-  // Highlight matches in the test string
+  }, [regex, flags, testString]); // Highlight matches in the test string
   const renderHighlightedString = () => {
     if (!regex || matches.length === 0) return testString;
 
     let result = [];
     let lastIndex = 0;
 
-    // Sort matches by index to ensure correct order
-    const sortedMatches = [...matches].sort((a, b) => a.index - b.index);
+    // Filter out zero-length matches and sort by index to ensure correct order
+    const sortedMatches = [...matches]
+      .filter((match) => match.value.length > 0)
+      .sort((a, b) => a.index - b.index);
 
+    // Handle overlapping matches by keeping only non-overlapping ones
+    const nonOverlappingMatches = [];
     for (const match of sortedMatches) {
+      const matchEnd = match.index + match.value.length;
+      // Only add matches that don't overlap with previously added matches
+      if (nonOverlappingMatches.length === 0 || match.index >= lastIndex) {
+        nonOverlappingMatches.push(match);
+        lastIndex = matchEnd;
+      }
+    }
+
+    lastIndex = 0;
+    for (const match of nonOverlappingMatches) {
       // Add text before match
       if (match.index > lastIndex) {
         result.push(

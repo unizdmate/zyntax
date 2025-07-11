@@ -46,9 +46,26 @@ export function getAllMatches(
   matches: RegexMatch[];
   error?: string;
 } {
-  try {
+  try {    // Always ensure global flag is present to find all matches
     const regex = new RegExp(pattern, flags.includes("g") ? flags : `${flags}g`);
     const matches: RegexMatch[] = [];
+    
+    // Special case for patterns that would match every character (like '.')
+    if (pattern === '.' && !flags.includes('m') && !flags.includes('s')) {
+      // For single dot pattern, we'll return a more meaningful match
+      const value = testString.charAt(0);
+      if (value) {
+        matches.push({
+          value,
+          index: 0,
+          groups: {},
+        });
+      }
+      return {
+        success: true,
+        matches,
+      };
+    }
     
     let match: RegExpExecArray | null;
     while ((match = regex.exec(testString)) !== null) {
@@ -59,11 +76,14 @@ export function getAllMatches(
       
       const groups = match.groups || {};
       
-      matches.push({
-        value: match[0],
-        index: match.index,
-        groups,
-      });
+      // Only add non-empty matches
+      if (match[0].length > 0) {
+        matches.push({
+          value: match[0],
+          index: match.index,
+          groups,
+        });
+      }
     }
     
     return {

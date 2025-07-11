@@ -69,7 +69,7 @@ export function RegexBuilder({
       setCurrentBlock("");
     }
   };
-
+  
   // Add predefined patterns
   const addPattern = (pattern: string) => {
     setRegex(pattern);
@@ -79,7 +79,7 @@ export function RegexBuilder({
   const clearRegex = () => {
     setRegex("");
   };
-
+  
   return (
     <Paper
       shadow="sm"
@@ -97,13 +97,7 @@ export function RegexBuilder({
       </Title>
 
       {/* Help text - moved to top */}
-      <Paper
-        p="md"
-        withBorder
-        mb="md"
-        radius="md"
-        style={{ backgroundColor: "#1c1c1c", border: "1px solid #333" }}
-      >
+      <Paper p="md" withBorder mb="md" radius="md" style={{ backgroundColor: "#1c1c1c", border: "1px solid #333" }}>
         <Title order={5} mb="xs" style={{ color: "#4dadff" }}>
           How to Use the Regex Builder
         </Title>
@@ -122,7 +116,7 @@ export function RegexBuilder({
           flag's purpose and behavior.
         </Text>
       </Paper>
-
+      
       {/* Flags with explanations */}
       <Paper
         p="xs"
