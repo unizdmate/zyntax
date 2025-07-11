@@ -98,14 +98,25 @@ export default function RegexGeneratorPage() {
 
             <RegexTester regex={regex} flags={flags} />
           </Stack>
-        </Grid.Col>
-
+        </Grid.Col>{" "}
         <Grid.Col span={{ base: 12, md: 4 }}>
-          <Paper shadow="sm" p="md" radius="md" withBorder>
+          <Paper
+            shadow="sm"
+            p="md"
+            radius="md"
+            withBorder
+            style={{
+              height: "75vh",
+              display: "flex",
+              flexDirection: "column",
+            }}
+          >
             <Title order={3} mb="md">
               Pattern Library
             </Title>
-            <RegexPatternLibrary setRegex={setRegex} />
+            <div style={{ overflow: "auto", flex: 1 }}>
+              <RegexPatternLibrary setRegex={setRegex} />
+            </div>
           </Paper>
         </Grid.Col>
       </Grid>
