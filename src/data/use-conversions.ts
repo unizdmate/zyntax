@@ -9,9 +9,15 @@ import {
   fetchConversion, 
   createConversion, 
   updateConversion, 
-  deleteConversion 
+  deleteConversion,
+  createSchemaConversion
 } from './conversions-api';
-import { Conversion, ConversionOptions, OutputLanguage } from '@/types';
+import { 
+  Conversion, 
+  ConversionOptions, 
+  OutputLanguage,
+  SchemaConversionOptions
+} from '@/types';
 
 // Query keys for caching
 const QUERY_KEYS = {
@@ -38,7 +44,7 @@ export function useConversion(id: string, options?: UseQueryOptions<Conversion>)
   });
 }
 
-// Hook to create a conversion
+// Hook to create a JSON to TypeScript conversion
 export function useCreateConversion() {
   const queryClient = useQueryClient();
   
@@ -54,6 +60,27 @@ export function useCreateConversion() {
       language: OutputLanguage;
       title?: string;
     }) => createConversion(inputJson, options, language, title),
+    onSuccess: () => {
+      // Invalidate and refetch conversions list when a new conversion is created
+      queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.conversions] });
+    },
+  });
+}
+
+// Hook to create a TypeScript to JSON Schema conversion
+export function useCreateSchemaConversion() {
+  const queryClient = useQueryClient();
+  
+  return useMutation({
+    mutationFn: ({
+      inputTypeScript,
+      options,
+      title,
+    }: {
+      inputTypeScript: string;
+      options: SchemaConversionOptions;
+      title?: string;
+    }) => createSchemaConversion(inputTypeScript, options, title),
     onSuccess: () => {
       // Invalidate and refetch conversions list when a new conversion is created
       queryClient.invalidateQueries({ queryKey: [QUERY_KEYS.conversions] });
